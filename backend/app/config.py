@@ -77,6 +77,16 @@ class Settings(BaseSettings):
     )
     debug: bool = False
 
+    # ── Supabase ──────────────────────────────────────────────────────
+    supabase_url: Optional[str] = Field(
+        default=None,
+        description="Supabase project URL.",
+    )
+    supabase_key: Optional[str] = Field(
+        default=None,
+        description="Supabase API key.",
+    )
+
     # ── Streaming ─────────────────────────────────────────────────────
     stream_chunk_delay_ms: int = Field(
         default=0,

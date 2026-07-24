@@ -2,7 +2,8 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Cpu, Sparkles, Activity } from "lucide-react";
+import { Cpu, Activity } from "lucide-react";
+import CloudBuddyLogo from "./CloudBuddyLogo";
 
 export type ConnectionStatus = "idle" | "processing" | "active" | "error";
 
@@ -64,20 +65,11 @@ export default function Navbar({
       {/* ── Brand & Title ────────────────────────────────────────────── */}
       <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
         <motion.div
-          whileHover={{ rotate: 180 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: "var(--radius-md)",
-            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-            boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          whileHover={{ scale: 1.1, rotate: [0, -8, 8, 0] }}
+          transition={{ duration: 0.4 }}
+          style={{ cursor: "pointer" }}
         >
-          <Sparkles size={22} color="#ffffff" />
+          <CloudBuddyLogo size={42} />
         </motion.div>
 
         <div>
@@ -100,9 +92,9 @@ export default function Navbar({
                 fontWeight: 600,
                 padding: "2px 8px",
                 borderRadius: "12px",
-                background: "rgba(99, 102, 241, 0.15)",
-                color: "#818cf8",
-                border: "1px solid rgba(99, 102, 241, 0.3)",
+                background: "rgba(56, 189, 248, 0.15)",
+                color: "#38bdf8",
+                border: "1px solid rgba(56, 189, 248, 0.3)",
               }}
             >
               v2.0 AI
@@ -111,15 +103,16 @@ export default function Navbar({
           <p
             style={{
               fontSize: "0.75rem",
-              color: "#64748b",
+              color: "#94a3b8",
               margin: 0,
               letterSpacing: "0.02em",
             }}
           >
-            Multimodal Architecture Tutor & Infrastructure Engine
+            Your Friendly Cloud Companion & Architecture Tutor
           </p>
         </div>
       </div>
+
 
       {/* ── Center: Gemma 4 Model Badge ──────────────────────────────── */}
       <motion.div

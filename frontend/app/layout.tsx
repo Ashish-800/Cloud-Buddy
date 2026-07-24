@@ -15,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CloudBuddy — AI System Design Tutor",
+  title: "Cloud Buddy — Sketch it. Learn it. Ship it.",
   description:
-    "Convert hand-drawn cloud architecture sketches into clean digital diagrams, architectural critiques, and HashiCorp Terraform code — powered by Gemma 4 Multimodal.",
+    "Upload a hand-drawn cloud architecture sketch → Get an instant architectural critique, interactive Mermaid diagram, and production-ready Terraform code — powered by Gemma 4 Multimodal.",
   keywords: [
     "cloud architecture",
     "system design",
@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     "Azure",
     "gemma",
     "AI tutor",
+    "infrastructure as code",
   ],
 };
 
@@ -37,9 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body style={{ backgroundColor: "#090d16", minHeight: "100vh" }}>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+
+    <!-- Cloud Body Gradient -->
+    <linearGradient id="cloudGrad" x1="15" y1="20" x2="105" y2="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <!-- Arm Gradients -->
+    <linearGradient id="leftArmGrad" x1="10" y1="45" x2="30" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+
+    <linearGradient id="rightHandGrad" x1="90" y1="40" x2="110" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+
+    <!-- Glossy Highlight -->
+    <linearGradient id="glossGrad" x1="40" y1="30" x2="40" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Background Card (Rounded Squircle) -->
+  <rect x="6" y="6" width="108" height="108" rx="24" fill="url(#bgGrad)" stroke="#38bdf8" stroke-width="2.5" stroke-opacity="0.7"/>
+
+  <!-- 2. Left Arm & Waving Hand (Blue) -->
+  <g id="left-arm">
+    <path d="M 30 60 C 20 55, 14 46, 12 48 C 10 50, 16 58, 26 66" fill="url(#leftArmGrad)" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 12 46 C 8 42, 10 36, 14 40 C 16 36, 20 38, 18 43 C 20 41, 23 45, 20 48 Z" fill="url(#leftArmGrad)" stroke="#0284c7" stroke-width="1.2"/>
+  </g>
+
+  <!-- 3. Right Arm & Waving Hand (Gold) -->
+  <g id="right-arm">
+    <path d="M 90 60 C 100 55, 106 46, 108 48 C 110 50, 104 58, 94 66" fill="url(#rightHandGrad)" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 108 46 C 112 42, 110 36, 106 40 C 104 36, 100 38, 102 43 C 100 41, 97 45, 100 48 Z" fill="url(#rightHandGrad)" stroke="#d97706" stroke-width="1.2"/>
+  </g>
+
+  <!-- 4. Fluffy Cloud Body -->
+  <path d="
+    M 35 78
+    C 22 78, 18 66, 24 56
+    C 20 44, 32 34, 44 36
+    C 50 26, 68 24, 78 32
+    C 88 26, 100 36, 96 48
+    C 104 56, 100 74, 85 78
+    C 78 84, 42 84, 35 78 Z
+  " fill="url(#cloudGrad)" stroke="#0284c7" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- 5. Highlights -->
+  <path d="M 42 40 C 46 34, 56 30, 64 31" stroke="url(#glossGrad)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 28 52 C 30 46, 35 42, 40 42" stroke="url(#glossGrad)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 6. Eyes -->
+  <circle cx="48" cy="56" r="4" fill="#0f172a"/>
+  <circle cx="49.5" cy="54.5" r="1.2" fill="#ffffff"/>
+
+  <circle cx="72" cy="56" r="4" fill="#0f172a"/>
+  <circle cx="73.5" cy="54.5" r="1.2" fill="#ffffff"/>
+
+  <!-- 7. Smile -->
+  <path d="M 53 63 Q 60 71 67 63" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+</svg>

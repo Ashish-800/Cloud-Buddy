@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
   FileCode2,
@@ -9,8 +9,10 @@ import {
   GitGraph,
   ChevronRight,
   StopCircle,
+  ArrowLeft,
 } from "lucide-react";
 
+import Navbar, { type ConnectionStatus } from "@/components/Navbar";
 import UploadDropzone from "@/components/UploadDropzone";
 import ComplianceUploader from "@/components/ComplianceUploader";
 import ProviderSelector, { type CloudProvider } from "@/components/ProviderSelector";
@@ -37,20 +39,46 @@ export default function WorkbenchPage() {
   const [complianceFile, setComplianceFile] = useState<File | null>(null);
   const [provider, setProvider] = useState<CloudProvider>("AWS");
   const [activeTab, setActiveTab] = useState<TabId>("critique");
-  const [editMode, setEditMode] = useState<"edit" | "analyze">("edit");
 
   const stream = useCloudCanvasStream();
+
+  /* ── Connection Status ────────────────────────────────────────── */
+  const connectionStatus: ConnectionStatus = stream.isStreaming
+    ? "processing"
+    : stream.error
+      ? "error"
+      : stream.isComplete
+        ? "active"
+        : "idle";
 
   const hasResults =
     stream.critiqueText !== null ||
     stream.mermaidCode !== null ||
     stream.terraformCode !== null;
 
+  /* ── Tab Configuration ────────────────────────────────────────── */
   const tabs: TabMeta[] = [
-    { id: "critique", label: "Anti-Patterns", icon: <MessageSquareWarning size={15} />, hasData: stream.critiqueText !== null },
-    { id: "diagram", label: "Interactive Diagram", icon: <GitGraph size={15} />, hasData: stream.mermaidCode !== null },
-    { id: "terraform", label: "Terraform Code", icon: <FileCode2 size={15} />, hasData: stream.terraformCode !== null },
+    {
+      id: "critique",
+      label: "Architectural Critique",
+      icon: <MessageSquareWarning size={15} />,
+      hasData: stream.critiqueText !== null,
+    },
+    {
+      id: "diagram",
+      label: "Interactive Diagram",
+      icon: <GitGraph size={15} />,
+      hasData: stream.mermaidCode !== null,
+    },
+    {
+      id: "terraform",
+      label: "Terraform Code",
+      icon: <FileCode2 size={15} />,
+      hasData: stream.terraformCode !== null,
+    },
   ];
+
+  /* ── Handlers ───────────────────────────────────────────────────── */
 
   const handleAnalyze = useCallback(async () => {
     if (!imageFile) return;
@@ -61,364 +89,383 @@ export default function WorkbenchPage() {
     stream.abort();
   }, [stream]);
 
+  /* ── Tab Content Renderer ───────────────────────────────────────── */
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "critique":
-        return <CritiqueViewer markdown={stream.critiqueText} isLoading={stream.isStreaming && !stream.critiqueText} />;
+        return (
+          <CritiqueViewer
+            markdown={stream.critiqueText}
+            isLoading={stream.isStreaming && !stream.critiqueText}
+          />
+        );
       case "diagram":
-        return <DiagramCanvas mermaidCode={stream.mermaidCode} isLoading={stream.isStreaming && !stream.mermaidCode} />;
+        return (
+          <DiagramCanvas
+            mermaidCode={stream.mermaidCode}
+            isLoading={stream.isStreaming && !stream.mermaidCode}
+          />
+        );
       case "terraform":
-        return <CodeExporter code={stream.terraformCode} isLoading={stream.isStreaming && !stream.terraformCode} />;
+        return (
+          <CodeExporter
+            code={stream.terraformCode}
+            isLoading={stream.isStreaming && !stream.terraformCode}
+          />
+        );
     }
   };
 
+  /* ── Main Render ───────────────────────────────────────────────── */
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: `calc(100dvh - var(--header-height))` }}>
-      {/* Breadcrumbs & Toolbar */}
-      <div
+    <div className="workbench-shell" style={{ display: "flex", flexDirection: "column" }}>
+      {/* Navbar with Gemma 4 Badge & Live Status */}
+      <Navbar status={connectionStatus} modelName="gemma-4-31b-it" />
+
+      {/* ── 2-Column Split Workbench Layout ─────────────────────────── */}
+      <main
         style={{
-          height: "48px",
-          borderBottom: "1px solid var(--outline-variant)",
-          padding: "0 var(--space-md)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "var(--surface-container-lowest)",
-          flexShrink: 0,
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "minmax(340px, 420px) 1fr",
+          gap: "20px",
+          padding: "20px",
+          maxWidth: "1680px",
+          width: "100%",
+          margin: "0 auto",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px" }}>
-          <a href="/" style={{ color: "var(--secondary)", textDecoration: "none" }}>CloudCanvas</a>
-          <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "var(--on-surface-variant)" }}>chevron_right</span>
-          <a href="/workbench" style={{ color: "var(--secondary)", textDecoration: "none" }}>Architectures</a>
-          <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "var(--on-surface-variant)" }}>chevron_right</span>
-          <span style={{ color: "var(--on-surface)" }}>My-New-Architecture</span>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)" }}>
-          {/* Edit / Analyze Toggle */}
-          <div
-            style={{
-              display: "flex",
-              background: "var(--surface-container)",
-              borderRadius: "var(--radius-md)",
-              padding: "2px",
-              border: "1px solid var(--outline-variant)",
-            }}
-          >
-            <button
-              onClick={() => setEditMode("edit")}
-              style={{
-                padding: "4px 12px",
-                fontSize: "12px",
-                fontWeight: editMode === "edit" ? 700 : 400,
-                background: editMode === "edit" ? "var(--surface-container-lowest)" : "transparent",
-                boxShadow: editMode === "edit" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
-                border: "none",
-                borderRadius: "var(--radius-md)",
-                cursor: "pointer",
-              }}
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => setEditMode("analyze")}
-              style={{
-                padding: "4px 12px",
-                fontSize: "12px",
-                fontWeight: editMode === "analyze" ? 700 : 400,
-                background: editMode === "analyze" ? "var(--surface-container-lowest)" : "transparent",
-                boxShadow: editMode === "analyze" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
-                border: "none",
-                borderRadius: "var(--radius-md)",
-                cursor: "pointer",
-                color: "var(--on-surface-variant)",
-              }}
-            >
-              Analyze
-            </button>
-          </div>
-
-          <a
-            href="/deploy"
-            className="btn-primary"
-            style={{ padding: "6px 16px", fontSize: "11px", fontWeight: 700, textDecoration: "none", letterSpacing: "0.04em" }}
-          >
-            Deploy
-          </a>
-        </div>
-      </div>
-
-      {/* Warning Banners */}
-      <div style={{ padding: "var(--space-sm)", display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
-        <div className="banner-warning">
-          <span className="material-symbols-outlined" style={{ color: "var(--primary-container)", fontSize: "20px" }}>warning</span>
-          <div>
-            <h4 style={{ fontSize: "12px", fontWeight: 700, margin: "0 0 2px" }}>Potential cost spike detected</h4>
-            <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", margin: 0 }}>
-              The current configuration for Multi-Region failover may increase monthly costs by ~45%.
-            </p>
-          </div>
-        </div>
-        <div className="banner-error">
-          <span className="material-symbols-outlined" style={{ color: "var(--error)", fontSize: "20px" }}>error</span>
-          <div>
-            <h4 style={{ fontSize: "12px", fontWeight: 700, margin: "0 0 2px" }}>Security vulnerability found</h4>
-            <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", margin: 0 }}>
-              S3 Bucket &apos;static-assets&apos; is configured with public-read access. Terraform plan will fail validation.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Work Area */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
-        {/* Canvas Area */}
-        <div
-          className="canvas-grid"
+        {/* ── LEFT PANEL: Workspace Input ─────────────────────────── */}
+        <motion.aside
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="glass-panel"
           style={{
-            flex: 1,
-            position: "relative",
-            background: "var(--surface-container-lowest)",
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            height: "fit-content",
+            position: "sticky",
+            top: "84px",
+          }}
+        >
+          {/* Back to landing */}
+          <a
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: "0.75rem",
+              color: "#64748b",
+              textDecoration: "none",
+              fontFamily: "var(--font-mono)",
+              transition: "color 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#818cf8")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
+          >
+            <ArrowLeft size={12} /> Back to Cloud Buddy
+          </a>
+
+          {/* Header */}
+          <div>
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "#f8fafc",
+                margin: "0 0 4px",
+              }}
+            >
+              Workspace Input
+            </h2>
+            <p style={{ fontSize: "0.8125rem", color: "#64748b", margin: 0 }}>
+              Upload architecture sketch & security guidelines
+            </p>
+          </div>
+
+          <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
+
+          {/* 1. Drag & Drop Sketch Upload Zone */}
+          <UploadDropzone
+            onFileSelect={setImageFile}
+            selectedFile={imageFile}
+            disabled={stream.isStreaming}
+          />
+
+          {/* 2. Optional Compliance / Security Policy Uploader */}
+          <ComplianceUploader
+            onFileSelect={setComplianceFile}
+            selectedFile={complianceFile}
+            disabled={stream.isStreaming}
+          />
+
+          {/* 3. Cloud Provider Segmented Pill Control */}
+          <ProviderSelector
+            selected={provider}
+            onSelect={setProvider}
+            disabled={stream.isStreaming}
+          />
+
+          <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
+
+          {/* 4. Trigger / Abort Button */}
+          {stream.isStreaming ? (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleAbort}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                width: "100%",
+                padding: "14px 28px",
+                borderRadius: "var(--radius-md)",
+                fontSize: "0.9375rem",
+                fontWeight: 700,
+                color: "#ffffff",
+                background: "linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)",
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 0 20px rgba(244, 63, 94, 0.4)",
+              }}
+            >
+              <StopCircle size={18} />
+              Stop Analysis
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={imageFile ? { scale: 1.02 } : undefined}
+              whileTap={imageFile ? { scale: 0.98 } : undefined}
+              className="btn-analyze"
+              disabled={!imageFile}
+              onClick={handleAnalyze}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                width: "100%",
+              }}
+            >
+              <Sparkles size={18} />
+              Analyze System Design
+              <ChevronRight size={16} style={{ opacity: 0.7 }} />
+            </motion.button>
+          )}
+
+          {/* Error Banner */}
+          <AnimatePresence>
+            {stream.error && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid rgba(244, 63, 94, 0.4)",
+                  background: "rgba(244, 63, 94, 0.1)",
+                  fontSize: "0.8125rem",
+                  color: "#f43f5e",
+                  lineHeight: 1.5,
+                }}
+              >
+                {stream.error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Active Model Context */}
+          <AnimatePresence>
+            {stream.activeModel && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "0.75rem",
+                  color: "#64748b",
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                <span className="status-dot status-dot--active" />
+                {stream.activeModel} · {stream.activeProvider}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.aside>
+
+        {/* ── RIGHT PANEL: Live Intelligence Dashboard ────────────── */}
+        <motion.section
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="glass-panel"
+          style={{
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "calc(100vh - 120px)",
             overflow: "hidden",
           }}
         >
-          {/* Upload + Controls Panel (centered) */}
+          {/* Tab Navigation Bar */}
           <div
             style={{
-              position: "absolute",
-              inset: 0,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "var(--space-xl)",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              padding: "0 12px",
+              background: "rgba(15,23,42,0.5)",
             }}
           >
-            {!imageFile && !hasResults ? (
-              /* Upload state */
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)", width: "100%", maxWidth: "480px" }}>
-                <UploadDropzone onFileSelect={setImageFile} selectedFile={imageFile} disabled={stream.isStreaming} />
-                <ComplianceUploader onFileSelect={setComplianceFile} selectedFile={complianceFile} disabled={stream.isStreaming} />
-                <ProviderSelector selected={provider} onSelect={setProvider} disabled={stream.isStreaming} />
+            {tabs.map((tab) => {
+              const isActive = tab.id === activeTab;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "16px 20px",
+                    fontSize: "0.875rem",
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? "#818cf8" : "#64748b",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "color 0.2s ease",
+                  }}
+                >
+                  {tab.icon}
+                  {tab.label}
 
-                <div style={{ height: 1, background: "var(--aws-border-color)" }} />
-
-                {/* Analyze / Abort */}
-                {stream.isStreaming ? (
-                  <button onClick={handleAbort} className="btn-primary" style={{ width: "100%", justifyContent: "center", background: "var(--error)" }}>
-                    <StopCircle size={16} />
-                    Stop Analysis
-                  </button>
-                ) : (
-                  <button
-                    className="btn-primary"
-                    disabled={!imageFile}
-                    onClick={handleAnalyze}
-                    style={{ width: "100%", justifyContent: "center" }}
-                  >
-                    <Sparkles size={16} />
-                    Analyze System Design
-                    <ChevronRight size={14} style={{ opacity: 0.6 }} />
-                  </button>
-                )}
-
-                {/* Error */}
-                <AnimatePresence>
-                  {stream.error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
+                  {tab.hasData && (
+                    <span
                       style={{
-                        padding: "12px 14px",
-                        borderRadius: "var(--radius-md)",
-                        border: "1px solid rgba(186, 26, 26, 0.3)",
-                        background: "rgba(186, 26, 26, 0.06)",
-                        fontSize: "12px",
-                        color: "var(--error)",
+                        width: 6, height: 6, borderRadius: "50%",
+                        background: "#10b981",
+                        boxShadow: "0 0 10px rgba(16,185,129,0.6)",
+                        flexShrink: 0,
                       }}
-                    >
-                      {stream.error}
-                    </motion.div>
+                    />
                   )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              /* Architecture cards placeholder */
-              <div style={{ display: "flex", gap: "var(--space-xl)", flexWrap: "wrap", justifyContent: "center" }}>
-                <div className="card" style={{ padding: "var(--space-md)", width: "288px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", marginBottom: "var(--space-md)", borderBottom: "1px solid var(--outline-variant)", paddingBottom: "var(--space-xs)" }}>
-                    <span className="material-symbols-outlined" style={{ color: "var(--secondary)" }}>cloud</span>
-                    <span style={{ fontSize: "16px", fontWeight: 600 }}>AWS VPC</span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--surface-container-low)", padding: "var(--space-xs)", borderRadius: "var(--radius-md)" }}>
-                      <span style={{ fontSize: "12px", color: "var(--on-surface-variant)" }}>Public Subnet</span>
-                      <span style={{ fontSize: "10px", background: "var(--secondary-fixed)", color: "var(--on-secondary-container)", padding: "1px 4px", borderRadius: "var(--radius-md)" }}>10.0.1.0/24</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--surface-container-low)", padding: "var(--space-xs)", borderRadius: "var(--radius-md)" }}>
-                      <span style={{ fontSize: "12px", color: "var(--on-surface-variant)" }}>Private Subnet</span>
-                      <span style={{ fontSize: "10px", background: "var(--secondary-fixed)", color: "var(--on-secondary-container)", padding: "1px 4px", borderRadius: "var(--radius-md)" }}>10.0.2.0/24</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="card" style={{ padding: "var(--space-md)", width: "256px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", marginBottom: "var(--space-md)", borderBottom: "1px solid var(--outline-variant)", paddingBottom: "var(--space-xs)" }}>
-                    <span className="material-symbols-outlined" style={{ color: "var(--primary)" }}>dns</span>
-                    <span style={{ fontSize: "16px", fontWeight: 600 }}>EC2 Cluster</span>
-                  </div>
-                  <div style={{ height: "128px", border: "1px dashed var(--outline-variant)", borderRadius: "var(--radius-md)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-container-low)" }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: "48px", color: "var(--outline)", opacity: 0.5 }}>storage</span>
-                  </div>
-                </div>
+
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-tab-glow"
+                      style={{
+                        position: "absolute",
+                        bottom: 0, left: 0, right: 0, height: 2,
+                        background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
+                        borderRadius: "2px 2px 0 0",
+                        boxShadow: "0 0 12px rgba(99,102,241,0.8)",
+                      }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+
+            {stream.detectedComponents.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", marginLeft: "auto", paddingRight: 16 }}>
+                <span
+                  style={{
+                    fontSize: "0.75rem", color: "#818cf8",
+                    fontFamily: "var(--font-mono)", padding: "3px 10px",
+                    borderRadius: 12, background: "rgba(99,102,241,0.12)",
+                    border: "1px solid rgba(99,102,241,0.25)",
+                  }}
+                >
+                  {stream.detectedComponents.length} components detected
+                </span>
               </div>
             )}
           </div>
 
-          {/* Canvas Controls */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "var(--space-md)",
-              left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              background: "var(--surface-container-lowest)",
-              border: "1px solid var(--outline-variant)",
-              borderRadius: "999px",
-              padding: "4px var(--space-md)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-          >
-            {["zoom_in", "zoom_out"].map((icon) => (
-              <button key={icon} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", borderRadius: "50%" }}>
-                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>{icon}</span>
-              </button>
-            ))}
-            <div style={{ width: 1, height: 24, background: "var(--outline-variant)", margin: "0 4px" }} />
-            {["undo", "redo"].map((icon) => (
-              <button key={icon} style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", borderRadius: "50%" }}>
-                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>{icon}</span>
-              </button>
-            ))}
-            <div style={{ width: 1, height: 24, background: "var(--outline-variant)", margin: "0 4px" }} />
-            <button style={{ padding: "8px", background: "none", border: "none", cursor: "pointer", borderRadius: "50%" }}>
-              <span className="material-symbols-outlined" style={{ fontSize: "20px", color: "var(--primary)" }}>auto_fix</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Right Sidebar: Intelligence + Terraform */}
-        <aside
-          style={{
-            width: "320px",
-            background: "var(--surface-container-lowest)",
-            borderLeft: "1px solid var(--outline-variant)",
-            display: "flex",
-            flexDirection: "column",
-            flexShrink: 0,
-          }}
-        >
-          {/* Intelligence Panel */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", borderBottom: "1px solid var(--outline-variant)", minHeight: 0 }}>
-            <div style={{ padding: "var(--space-md)", background: "var(--surface-container-low)", borderBottom: "1px solid var(--outline-variant)", display: "flex", alignItems: "center", gap: "var(--space-sm)", flexShrink: 0 }}>
-              <span className="material-symbols-outlined" style={{ color: "var(--primary)" }}>psychology</span>
-              <h3 style={{ fontSize: "16px", fontWeight: 600, margin: 0 }}>Intelligence</h3>
-            </div>
-            <div style={{ flex: 1, overflow: "auto", padding: "var(--space-md)" }}>
-              {hasResults ? (
-                <div>
-                  {/* Tab bar for results */}
-                  <div style={{ display: "flex", gap: "2px", marginBottom: "var(--space-md)" }}>
-                    {tabs.map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        style={{
-                          flex: 1,
-                          padding: "6px 8px",
-                          fontSize: "11px",
-                          fontWeight: activeTab === tab.id ? 700 : 400,
-                          background: activeTab === tab.id ? "var(--surface-container)" : "transparent",
-                          border: activeTab === tab.id ? "1px solid var(--outline-variant)" : "1px solid transparent",
-                          borderRadius: "var(--radius-md)",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "4px",
-                          color: activeTab === tab.id ? "var(--on-surface)" : "var(--on-surface-variant)",
-                        }}
-                      >
-                        {tab.icon}
-                        {tab.hasData && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />}
-                      </button>
-                    ))}
-                  </div>
-                  {renderTabContent()}
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
-                  {/* Anti-Patterns */}
-                  <div>
-                    <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--on-surface-variant)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "var(--space-sm)" }}>Anti-Patterns</p>
-                    <div className="card" style={{ padding: "var(--space-sm)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)" }}>
-                        <span className="material-symbols-outlined" style={{ color: "var(--error)", fontSize: "18px" }}>cancel</span>
-                        <span style={{ fontSize: "12px", fontWeight: 700 }}>Hardcoded Credentials</span>
-                      </div>
-                      <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", margin: "4px 0 0" }}>Detected plain-text access keys in user data scripts.</p>
+          {/* Tab Content Display */}
+          <div style={{ flex: 1, overflow: "auto" }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  height: "100%",
+                  ...(activeTab !== "diagram" ? { padding: "24px" } : {}),
+                }}
+              >
+                {!hasResults && !stream.isStreaming ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "100px 24px",
+                      textAlign: "center",
+                      gap: "16px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 64, height: 64,
+                        borderRadius: "var(--radius-lg)",
+                        background: "rgba(99,102,241,0.1)",
+                        border: "1px solid rgba(99,102,241,0.2)",
+                        boxShadow: "0 0 30px rgba(99,102,241,0.15)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Sparkles size={28} color="#818cf8" />
                     </div>
+                    <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "#f8fafc", margin: 0 }}>
+                      Live Intelligence Dashboard
+                    </h3>
+                    <p style={{ fontSize: "0.875rem", color: "#64748b", margin: 0, maxWidth: 400, lineHeight: 1.6 }}>
+                      Upload an architecture sketch and click{" "}
+                      <strong style={{ color: "#818cf8" }}>Analyze System Design</strong>{" "}
+                      to watch Gemma 4 produce real-time critiques, Mermaid diagrams, and Terraform code.
+                    </p>
                   </div>
-
-                  {/* Critiques */}
-                  <div>
-                    <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--on-surface-variant)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "var(--space-sm)" }}>Critiques</p>
-                    <div style={{ background: "var(--surface-container-low)", border: "1px solid rgba(219, 194, 173, 0.3)", borderRadius: "var(--radius-lg)", padding: "var(--space-sm)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", color: "var(--primary)" }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>lightbulb</span>
-                        <span style={{ fontSize: "12px", fontWeight: 700 }}>Cost Optimization</span>
-                      </div>
-                      <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", margin: "4px 0 0" }}>Switching to Graviton3 instances (t4g) could reduce costs by 20% for this workload.</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                ) : (
+                  renderTabContent()
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
+        </motion.section>
+      </main>
 
-          {/* Terraform Lab */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, background: "#232f3e", color: "white" }}>
-            <div style={{ padding: "var(--space-md)", background: "#161e2d", borderBottom: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
-                <span className="material-symbols-outlined" style={{ color: "var(--secondary-container)" }}>terminal</span>
-                <h3 style={{ fontSize: "16px", fontWeight: 600, margin: 0 }}>Terraform Lab</h3>
-              </div>
-              <span style={{ fontSize: "12px", color: "var(--secondary-fixed)", opacity: 0.6 }}>main.tf</span>
-            </div>
-            <div className="code-block" style={{ flex: 1, overflow: "auto", padding: "var(--space-md)", background: "#1e2631" }}>
-              <pre style={{ whiteSpace: "pre-wrap", margin: 0, fontSize: "12px", lineHeight: "18px" }}>
-                <span style={{ color: "var(--primary-fixed-dim)" }}>resource</span>{" "}
-                <span style={{ color: "var(--tertiary-fixed-dim)" }}>&quot;aws_vpc&quot;</span> &quot;main&quot; {`{`}{"\n"}
-                {"  "}cidr_block = <span style={{ color: "var(--secondary-fixed)" }}>&quot;10.0.0.0/16&quot;</span>{"\n"}
-                {"\n"}
-                {"  "}enable_dns_hostnames = <span style={{ color: "var(--secondary-fixed-dim)" }}>true</span>{"\n"}
-                {"\n"}
-                {"  "}tags = {`{`}{"\n"}
-                {"    "}Name = <span style={{ color: "var(--secondary-fixed)" }}>&quot;cloud-canvas-vpc&quot;</span>{"\n"}
-                {"  "}{`}`}{"\n"}
-                {`}`}
-              </pre>
-            </div>
-            <div style={{ padding: "var(--space-sm)", background: "#161e2d", display: "flex", gap: "var(--space-sm)", flexShrink: 0 }}>
-              <button style={{ flex: 1, background: "var(--secondary)", color: "white", padding: "6px", borderRadius: "var(--radius-md)", border: "none", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>Copy</button>
-              <button style={{ flex: 1, background: "rgba(255,255,255,0.1)", color: "white", padding: "6px", borderRadius: "var(--radius-md)", border: "none", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>Validate</button>
-            </div>
-          </div>
-        </aside>
-      </div>
+      {/* Responsive Breakpoint Override */}
+      <style>{`
+        @media (max-width: 960px) {
+          main {
+            grid-template-columns: 1fr !important;
+          }
+          aside {
+            position: static !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
