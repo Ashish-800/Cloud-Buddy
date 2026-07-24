@@ -1,5 +1,5 @@
 """
-CloudCanvas – FastAPI Application Entry-point
+CloudBuddy – FastAPI Application Entry-point
 ===============================================
 Sets up the FastAPI app, CORS middleware, health probes, and the
 `/api/v1/analyze` SSE endpoint that orchestrates architecture analysis.
@@ -25,7 +25,7 @@ logging.basicConfig(
     level=logging.DEBUG if settings.debug else logging.INFO,
     format="%(asctime)s │ %(name)-30s │ %(levelname)-7s │ %(message)s",
 )
-logger = logging.getLogger("cloudcanvas.main")
+logger = logging.getLogger("cloudbuddy.main")
 
 # ── FastAPI App ───────────────────────────────────────────────────────────
 
@@ -33,7 +33,7 @@ app = FastAPI(
     title=settings.app_title,
     version=settings.app_version,
     description=(
-        "**CloudCanvas API** — Upload a hand-drawn cloud architecture sketch "
+        "**CloudBuddy API** — Upload a hand-drawn cloud architecture sketch "
         "and receive a structured critique, Mermaid diagram, and Terraform code "
         "streamed back in real-time via Server-Sent Events."
     ),

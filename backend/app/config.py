@@ -1,5 +1,5 @@
 """
-CloudCanvas – Application Configuration
+CloudBuddy – Application Configuration
 =========================================
 Centralised, validated configuration loaded from environment variables
 (or a `.env` file) via Pydantic Settings.  Every secret and tunable
@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     )
 
     # ── Server ────────────────────────────────────────────────────────
-    app_title: str = "CloudCanvas API"
+    app_title: str = "CloudBuddy API"
     app_version: str = "1.0.0"
     cors_origins: list[str] = Field(
         default=["http://localhost:3000", "http://localhost:5173"],

@@ -1,4 +1,4 @@
-# ☁️ CloudCanvas — AI-Powered System Design Tutor
+# ☁️ CloudBuddy — AI-Powered System Design Tutor
 
 > **Upload a hand-drawn cloud architecture sketch → Get an instant architectural critique, interactive Mermaid diagram, and production-ready Terraform code** — powered by Gemma 4 Multimodal.
 
@@ -16,7 +16,7 @@ graph TD
     subgraph Frontend ["Next.js 16 + TypeScript"]
         A[Upload Dropzone] --> B[Compliance Uploader]
         B --> C[Provider Selector]
-        C --> D[useCloudCanvasStream Hook]
+        C --> D[useCloudBuddyStream Hook]
         D --> E[CritiqueViewer]
         D --> F[DiagramCanvas]
         D --> G[CodeExporter]
@@ -57,7 +57,7 @@ graph TD
 ## 📁 Project Structure
 
 ```
-cloud-canvas/
+cloud-buddy/
 ├── backend/                          # FastAPI Python backend
 │   ├── app/
 │   │   ├── main.py                   # FastAPI app, CORS, /api/v1/analyze
@@ -84,7 +84,7 @@ cloud-canvas/
 │   │   ├── DiagramCanvas.tsx         # Interactive Mermaid.js canvas
 │   │   └── CodeExporter.tsx          # Syntax-highlighted Terraform viewer
 │   └── hooks/
-│       └── useCloudCanvasStream.ts   # SSE streaming consumer hook
+│       └── useCloudBuddyStream.ts   # SSE streaming consumer hook
 │
 ├── scripts/
 │   └── seed_demo_data.py             # Generate mock sketches + compliance docs
@@ -109,7 +109,7 @@ cloud-canvas/
 
 ```bash
 git clone <your-repo-url>
-cd cloud-canvas
+cd cloud-buddy
 
 # Configure the backend
 cp backend/.env.example backend/.env
@@ -174,7 +174,7 @@ This creates `scripts/demo_data/` with:
 - `architecture_sketch_serverless.png` — Serverless event-driven
 - `SOC2_Compliance_Rules.txt` — Enterprise security policy
 
-Upload any sketch to CloudCanvas, attach the compliance doc, and hit **Analyze**!
+Upload any sketch to CloudBuddy, attach the compliance doc, and hit **Analyze**!
 
 ---
 
@@ -224,7 +224,7 @@ Returns `{ "status": "healthy" }` for liveness probes.
 
 ## 🛡️ Compliance Context Engine
 
-CloudCanvas supports **enterprise compliance enforcement** via its context injection layer:
+CloudBuddy supports **enterprise compliance enforcement** via its context injection layer:
 
 1. **Upload** a security policy document (PDF/TXT) alongside your sketch
 2. The full document is **injected into Gemma 4's system prompt** — not truncated to a user message
@@ -243,7 +243,7 @@ CloudCanvas supports **enterprise compliance enforcement** via its context injec
 - Hand-drawn whiteboard sketches are never digitised or validated
 - Compliance validation is manual, error-prone, and expensive
 
-### Our Solution: CloudCanvas
+### Our Solution: CloudBuddy
 - **One-click analysis** of whiteboard sketches using Gemma 4 Multimodal
 - **Real-time streaming** results via SSE for instant feedback
 - **Enterprise compliance enforcement** — upload your SOC2/HIPAA policy and get guaranteed compliance
@@ -284,6 +284,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  Built with ⚡ by the CloudCanvas team<br/>
+  Built with ⚡ by the CloudBuddy team<br/>
   Powered by <strong>Gemma 4 Multimodal</strong>
 </p>

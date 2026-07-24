@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────
-# CloudCanvas – Dev Launcher (macOS / Linux)
+# CloudBuddy – Dev Launcher (macOS / Linux)
 # ──────────────────────────────────────────────────────────────────
 # Starts both backend (FastAPI) and frontend (Next.js) concurrently.
 # Usage:  chmod +x dev.sh && ./dev.sh
@@ -10,7 +10,7 @@ set -e
 
 echo ""
 echo "  ╔══════════════════════════════════════════════╗"
-echo "  ║   CloudCanvas - AI System Design Tutor       ║"
+echo "  ║   CloudBuddy - AI System Design Tutor       ║"
 echo "  ║   Starting development servers...            ║"
 echo "  ╚══════════════════════════════════════════════╝"
 echo ""

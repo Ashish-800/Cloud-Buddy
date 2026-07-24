@@ -1,6 +1,6 @@
 @echo off
 REM ──────────────────────────────────────────────────────────────────
-REM CloudCanvas – Dev Launcher (Windows)
+REM CloudBuddy – Dev Launcher (Windows)
 REM ──────────────────────────────────────────────────────────────────
 REM Starts both backend (FastAPI) and frontend (Next.js) concurrently.
 REM Usage:  dev.bat
@@ -8,7 +8,7 @@ REM ─────────────────────────�
 
 echo.
 echo  ╔══════════════════════════════════════════════╗
-echo  ║   CloudCanvas - AI System Design Tutor       ║
+echo  ║   CloudBuddy - AI System Design Tutor       ║
 echo  ║   Starting development servers...            ║
 echo  ╚══════════════════════════════════════════════╝
 echo.
@@ -22,14 +22,14 @@ if not exist "backend\.env" (
 
 REM Start backend
 echo [1/2] Starting FastAPI backend on http://localhost:8000 ...
-start "CloudCanvas-Backend" cmd /c "cd backend && pip install -r requirements.txt >nul 2>&1 && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+start "CloudBuddy-Backend" cmd /c "cd backend && pip install -r requirements.txt >nul 2>&1 && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 REM Small delay to let backend initialize
 timeout /t 3 /nobreak >nul
 
 REM Start frontend
 echo [2/2] Starting Next.js frontend on http://localhost:3000 ...
-start "CloudCanvas-Frontend" cmd /c "cd frontend && npm run dev"
+start "CloudBuddy-Frontend" cmd /c "cd frontend && npm run dev"
 
 echo.
 echo  ✓ Both servers starting in separate windows.
