@@ -41,12 +41,18 @@ logger = logging.getLogger("cloudcanvas.gemma_service")
 _client: genai.Client | None = None
 
 
+def _get_model_name() -> str:
+    """Safely retrieve the model name string regardless of type."""
+    val = settings.gemma_model
+    return val.value if hasattr(val, "value") else str(val)
+
+
 def _get_client() -> genai.Client:
     """Lazy-init the GenAI client so import-time failures don't crash the app."""
     global _client
     if _client is None:
         _client = genai.Client(api_key=settings.google_api_key)
-        logger.info("Google GenAI client initialised (model=%s)", settings.gemma_model.value)
+        logger.info("Google GenAI client initialised (model=%s)", _get_model_name())
     return _client
 
 
@@ -233,7 +239,7 @@ async def analyze_architecture_stream(
         event_type=SSEEventType.METADATA,
         data=json.dumps({
             "cloud_provider": cloud_provider,
-            "model": settings.gemma_model.value,
+            "model": _get_model_name(),
             "status": "processing",
             "compliance_loaded": has_compliance,
         }),
@@ -249,7 +255,7 @@ async def analyze_architecture_stream(
         logger.info(
             "Sending analysis request to Gemma 4 (%s) — compliance=%s, "
             "system_prompt_len=%d, user_prompt_len=%d",
-            settings.gemma_model.value,
+            _get_model_name(),
             has_compliance,
             len(system_prompt),
             len(user_prompt),
@@ -261,7 +267,7 @@ async def analyze_architecture_stream(
         # acts as an immutable constraint layer.  The user prompt carries
         # the per-request analysis instructions.
         response = await client.aio.models.generate_content(
-            model=settings.gemma_model.value,
+            model=_get_model_name(),
             contents=[
                 image,
                 user_prompt,
