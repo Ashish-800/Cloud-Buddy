@@ -322,31 +322,33 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
         ].map((btn) => (
           <motion.button
             key={btn.label}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
             onClick={btn.action}
             title={btn.label}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "5px",
-              padding: "6px 10px",
+              gap: "6px",
+              height: "32px",
+              padding: "0 10px",
               borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--outline-variant)",
-              background: "transparent",
-              color: "var(--on-surface-variant)",
-              fontSize: "0.6875rem",
+              border: "1px solid var(--grid)",
+              background: "var(--navy)",
+              color: "var(--text-secondary)",
+              fontSize: "0.75rem",
+              fontFamily: "var(--font-mono)",
               fontWeight: 500,
               cursor: "pointer",
-              transition: "background 0.2s, border-color 0.2s",
+              transition: "all 0.15s ease",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-container-low)";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--outline)";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--marker)";
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--white-line)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--outline-variant)";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--grid)";
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
             }}
           >
             {btn.icon}
@@ -358,9 +360,14 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
         <span
           style={{
             marginLeft: "auto",
-            fontSize: "0.6875rem",
-            color: "var(--on-surface-variant)",
-            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: "0.75rem",
+            color: "var(--marker)",
+            fontFamily: "var(--font-mono)",
+            fontWeight: 700,
+            padding: "4px 8px",
+            background: "rgba(232, 135, 30, 0.12)",
+            border: "1px solid var(--grid)",
+            borderRadius: "var(--radius-sm)",
           }}
         >
           {Math.round(scale * 100)}%
@@ -373,7 +380,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
           flex: 1,
           overflow: "hidden",
           cursor: isPanning.current ? "grabbing" : "grab",
-          background: "var(--surface-container-low)",
+          background: "var(--navy-deep)",
           borderRadius: "0 0 var(--radius-md) var(--radius-md)",
           position: "relative",
         }}

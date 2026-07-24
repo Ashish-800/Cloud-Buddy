@@ -9,7 +9,6 @@ import {
   Zap,
   Activity,
   CheckCircle2,
-  AlertTriangle,
   Loader2,
 } from "lucide-react";
 import type { CritiqueData, DetectedComponent } from "@/hooks/useCloudCanvasStream";
@@ -26,15 +25,14 @@ export default function AIReasoningPanel({
   isStreaming,
   critiqueData,
   detectedComponents,
-  activeModel,
   activeProvider,
 }: AIReasoningPanelProps) {
   const score = critiqueData?.score ?? null;
 
-  // Calculate score color based on threshold
+  // Score color threshold
   const getScoreColor = (val: number) => {
     if (val >= 80) return "var(--accent-emerald)";
-    if (val >= 50) return "var(--accent-marker)";
+    if (val >= 50) return "var(--marker)";
     return "var(--accent-rose)";
   };
 
@@ -50,13 +48,13 @@ export default function AIReasoningPanel({
         background: "var(--navy)",
         border: "1px solid var(--grid)",
         borderRadius: "var(--radius-lg)",
-        padding: "18px",
+        padding: "16px",
         display: "flex",
         flexDirection: "column",
         gap: "16px",
       }}
     >
-      {/* ── Panel Header ────────────────────────────────────────────── */}
+      {/* ── Header ──────────────────────────────────────────────────── */}
       <div
         style={{
           display: "flex",
@@ -71,7 +69,7 @@ export default function AIReasoningPanel({
           <h3
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "0.9375rem",
+              fontSize: "0.875rem",
               fontWeight: 700,
               color: "var(--white-line)",
               margin: 0,
@@ -105,7 +103,7 @@ export default function AIReasoningPanel({
             </>
           ) : (
             <>
-              <CheckCircle2 size={10} /> Model Ready
+              <CheckCircle2 size={10} /> Gemma 4 Ready
             </>
           )}
         </span>
@@ -124,7 +122,7 @@ export default function AIReasoningPanel({
         <div
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "0.6875rem",
+            fontSize: "0.625rem",
             color: "var(--text-muted)",
             textTransform: "uppercase",
             letterSpacing: "0.08em",
@@ -137,7 +135,7 @@ export default function AIReasoningPanel({
         <div
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "2.75rem",
+            fontSize: "2.5rem",
             fontWeight: 800,
             color: score !== null ? getScoreColor(score) : "var(--text-muted)",
             lineHeight: 1,
@@ -151,9 +149,9 @@ export default function AIReasoningPanel({
         <div
           style={{
             width: "100%",
-            height: "8px",
+            height: "6px",
             background: "rgba(29, 78, 122, 0.4)",
-            borderRadius: "4px",
+            borderRadius: "3px",
             overflow: "hidden",
             margin: "0 auto 8px",
           }}
@@ -165,7 +163,7 @@ export default function AIReasoningPanel({
             style={{
               height: "100%",
               background: score !== null ? getScoreColor(score) : "transparent",
-              borderRadius: "4px",
+              borderRadius: "3px",
             }}
           />
         </div>
@@ -179,15 +177,15 @@ export default function AIReasoningPanel({
           {score === null
             ? "Upload a sketch to compute health score"
             : score >= 80
-            ? "🟢 Enterprise Ready & Highly Resilient"
+            ? "Enterprise Ready & Highly Resilient"
             : score >= 50
-            ? "🟡 Moderate Risk — Security & Single Points of Failure Detected"
-            : "🔴 High Risk — Critical Compliance Violations & SPOF"}
+            ? "Moderate Risk — SPOF Detected"
+            : "High Risk — Critical Compliance SPOF"}
         </div>
       </div>
 
-      {/* ── Sub-Scores Progress Bar Metrics ─────────────────────────── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      {/* ── Sub-Scores Metrics ─────────────────────────────────────── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {[
           { label: "Security Posture", val: securityScore, icon: ShieldCheck },
           { label: "Cost Optimization", val: costScore, icon: DollarSign },
@@ -245,7 +243,7 @@ export default function AIReasoningPanel({
         })}
       </div>
 
-      {/* ── Live AI Reasoning Activity Feed ────────────────────────── */}
+      {/* ── Live Reasoning Feed ─────────────────────────────────────── */}
       <div
         style={{
           borderTop: "1px solid var(--grid)",
@@ -262,7 +260,7 @@ export default function AIReasoningPanel({
             marginBottom: "8px",
           }}
         >
-          Live AI Reasoning Pipeline
+          Live AI Pipeline
         </div>
 
         <div
@@ -276,16 +274,16 @@ export default function AIReasoningPanel({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ color: "var(--accent-emerald)" }}>✓</span> Ingested Multimodal Vision Canvas
+            <span style={{ color: "var(--accent-emerald)" }}>✓</span> Multimodal Vision Ingested
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ color: "var(--accent-emerald)" }}>✓</span> Mapped {detectedComponents.length} Cloud Service Nodes
+            <span style={{ color: "var(--accent-emerald)" }}>✓</span> Mapped {detectedComponents.length} Service Nodes
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ color: isStreaming ? "var(--marker)" : "var(--accent-emerald)" }}>
               {isStreaming ? "●" : "✓"}
             </span>{" "}
-            Cross-referencing Well-Architected Framework ({activeProvider || "AWS"})
+            Validating {activeProvider || "AWS"} Architecture
           </div>
         </div>
       </div>

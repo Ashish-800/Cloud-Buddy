@@ -1,223 +1,398 @@
 "use client";
 
 import React, { useState } from "react";
-
-/* ── Knowledge Hub Page ──────────────────────────────────────────────── */
-/* Matches Stitch Screen 4: Educational reference with docs, code, tables */
+import Link from "next/link";
+import {
+  BookOpen,
+  Network,
+  Shield,
+  Server,
+  Cpu,
+  Zap,
+  HardDrive,
+  Database,
+  Lock,
+  CheckCircle2,
+  Copy,
+  Sparkles,
+  Layers,
+  Check,
+} from "lucide-react";
 
 const TOPICS = [
-  { id: "vpc", label: "VPC Architecture & Subnets", category: "Networking", icon: "cloud" },
-  { id: "sg", label: "Security Groups", category: "Networking", icon: "shield" },
-  { id: "elb", label: "Load Balancers", category: "Networking", icon: "dns" },
-  { id: "ec2", label: "EC2 Instance Types", category: "Compute", icon: "memory" },
-  { id: "lambda", label: "Lambda Functions", category: "Compute", icon: "bolt" },
-  { id: "s3", label: "S3 Storage", category: "Storage", icon: "storage" },
-  { id: "rds", label: "RDS Databases", category: "Storage", icon: "database" },
-  { id: "iam", label: "IAM Best Practices", category: "Security", icon: "admin_panel_settings" },
-  { id: "nacl", label: "NACLs vs Security Groups", category: "Security", icon: "security" },
+  { id: "vpc", label: "VPC Architecture & Subnets", category: "Networking", icon: Network },
+  { id: "sg", label: "Security Groups & NACLs", category: "Networking", icon: Shield },
+  { id: "elb", label: "Application Load Balancers", category: "Networking", icon: Server },
+  { id: "ec2", label: "EC2 Instance Profiles", category: "Compute", icon: Cpu },
+  { id: "lambda", label: "Lambda Serverless Functions", category: "Compute", icon: Zap },
+  { id: "s3", label: "S3 Object Storage", category: "Storage", icon: HardDrive },
+  { id: "rds", label: "RDS Multi-AZ Databases", category: "Storage", icon: Database },
+  { id: "iam", label: "IAM Role Best Practices", category: "Security", icon: Lock },
 ];
 
 const CATEGORIES = ["Networking", "Compute", "Storage", "Security"];
 
 export default function KnowledgeHubPage() {
   const [activeTopic, setActiveTopic] = useState("vpc");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div style={{ display: "flex", height: `calc(100dvh - var(--header-height))` }}>
-      {/* Knowledge Sidebar */}
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        background: "var(--navy-deep)",
+        color: "var(--text-primary)",
+        overflow: "hidden",
+      }}
+    >
+      {/* ── Knowledge Sidebar ───────────────────────────────────────── */}
       <div
         style={{
-          width: "260px",
-          borderRight: "1px solid var(--outline-variant)",
-          background: "var(--surface-container-lowest)",
+          width: "280px",
+          borderRight: "1px solid var(--grid)",
+          background: "var(--navy)",
           overflowY: "auto",
           flexShrink: 0,
-          padding: "var(--space-md)",
+          padding: "20px 16px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", marginBottom: "var(--space-lg)" }}>
-          <span className="material-symbols-outlined" style={{ color: "var(--primary)" }}>menu_book</span>
-          <h2 style={{ fontSize: "16px", fontWeight: 600, margin: 0 }}>Knowledge Base</h2>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "20px",
+            borderBottom: "1px solid var(--grid)",
+            paddingBottom: "12px",
+          }}
+        >
+          <BookOpen size={20} color="var(--marker)" />
+          <div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "var(--white-line)",
+                margin: 0,
+              }}
+            >
+              Knowledge Hub
+            </h2>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.625rem",
+                color: "var(--text-muted)",
+              }}
+            >
+              Cloud Architecture Patterns
+            </span>
+          </div>
         </div>
-
-        <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--on-surface-variant)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "var(--space-sm)" }}>
-          Core Concepts
-        </p>
 
         {CATEGORIES.map((cat) => (
-          <div key={cat} style={{ marginBottom: "var(--space-md)" }}>
-            <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--on-surface-variant)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "var(--space-xs)" }}>
+          <div key={cat} style={{ marginBottom: "20px" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.625rem",
+                fontWeight: 700,
+                color: "var(--text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: "8px",
+                paddingLeft: "8px",
+              }}
+            >
               {cat}
-            </p>
-            {TOPICS.filter((t) => t.category === cat).map((topic) => (
-              <button
-                key={topic.id}
-                onClick={() => setActiveTopic(topic.id)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "var(--space-sm)",
-                  width: "100%",
-                  padding: "6px var(--space-sm)",
-                  fontSize: "12px",
-                  fontWeight: activeTopic === topic.id ? 700 : 400,
-                  color: activeTopic === topic.id ? "var(--on-surface)" : "var(--on-surface-variant)",
-                  background: activeTopic === topic.id ? "var(--surface-container-high)" : "transparent",
-                  border: "none",
-                  borderLeft: activeTopic === topic.id ? "2px solid var(--primary-container)" : "2px solid transparent",
-                  borderRadius: "0 var(--radius-md) var(--radius-md) 0",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.15s",
-                }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>{topic.icon}</span>
-                {topic.label}
-              </button>
-            ))}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              {TOPICS.filter((t) => t.category === cat).map((topic) => {
+                const Icon = topic.icon;
+                const isActive = activeTopic === topic.id;
+                return (
+                  <button
+                    key={topic.id}
+                    onClick={() => setActiveTopic(topic.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      width: "100%",
+                      padding: "8px 10px",
+                      fontSize: "0.8125rem",
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? "var(--marker)" : "var(--text-secondary)",
+                      background: isActive ? "rgba(232, 135, 30, 0.12)" : "transparent",
+                      border: "none",
+                      borderLeft: isActive ? "2px solid var(--marker)" : "2px solid transparent",
+                      borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <Icon size={15} color={isActive ? "var(--marker)" : "var(--text-muted)"} />
+                    <span style={{ flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {topic.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ))}
-
-        {/* Sub-sections */}
-        <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--on-surface-variant)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: "var(--space-lg)", marginBottom: "var(--space-sm)" }}>
-          Resources
-        </p>
-        <button style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", width: "100%", padding: "6px var(--space-sm)", fontSize: "12px", color: "var(--on-surface-variant)", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
-          <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>auto_awesome</span>
-          Networking Best Practices
-        </button>
-        <button style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)", width: "100%", padding: "6px var(--space-sm)", fontSize: "12px", color: "var(--on-surface-variant)", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>
-          <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>security</span>
-          Security Fundamentals
-        </button>
-
-        <div style={{ marginTop: "var(--space-lg)", padding: "var(--space-md)", background: "var(--surface-container-low)", borderRadius: "var(--radius-lg)", border: "1px solid var(--outline-variant)" }}>
-          <span className="material-symbols-outlined" style={{ fontSize: "20px", color: "var(--primary)", marginBottom: "4px", display: "block" }}>upgrade</span>
-          <p style={{ fontSize: "11px", fontWeight: 700, marginBottom: "4px" }}>Upgrade to Pro</p>
-          <p style={{ fontSize: "10px", color: "var(--on-surface-variant)", margin: 0 }}>Access advanced tutorials and compliance guides.</p>
-        </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "var(--space-lg) var(--space-xl)", paddingBottom: "calc(var(--footer-height) + var(--space-xl))" }}>
-        {/* Breadcrumbs */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", marginBottom: "var(--space-lg)" }}>
-          <span style={{ color: "var(--on-surface-variant)" }}>Knowledge Hub</span>
-          <span className="material-symbols-outlined" style={{ fontSize: "14px", color: "var(--on-surface-variant)" }}>chevron_right</span>
-          <span style={{ color: "var(--on-surface-variant)" }}>Networking</span>
-          <span className="material-symbols-outlined" style={{ fontSize: "14px", color: "var(--on-surface-variant)" }}>chevron_right</span>
-          <span style={{ color: "var(--on-surface)" }}>VPC Architecture & Subnets</span>
+      {/* ── Main Knowledge Content Display ──────────────────────────── */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "28px 36px",
+          background: "var(--navy-deep)",
+        }}
+      >
+        {/* Breadcrumb */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "0.75rem",
+            fontFamily: "var(--font-mono)",
+            marginBottom: "16px",
+          }}
+        >
+          <Link href="/workbench" style={{ color: "var(--text-muted)", textDecoration: "none" }}>
+            Workbench
+          </Link>
+          <span style={{ color: "var(--grid)" }}>/</span>
+          <span style={{ color: "var(--text-secondary)" }}>Knowledge Hub</span>
+          <span style={{ color: "var(--grid)" }}>/</span>
+          <span style={{ color: "var(--marker)", fontWeight: 700 }}>VPC Architecture Foundation</span>
         </div>
 
         {/* Title */}
-        <h1 style={{ fontSize: "24px", fontWeight: 600, lineHeight: "32px", marginBottom: "8px" }}>
+        <h1
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "1.75rem",
+            fontWeight: 700,
+            color: "var(--white-line)",
+            marginBottom: "8px",
+          }}
+        >
           Amazon VPC Architecture Foundation
         </h1>
-        <p style={{ fontSize: "14px", color: "var(--on-surface-variant)", marginBottom: "var(--space-xl)", maxWidth: "720px" }}>
+        <p
+          style={{
+            fontSize: "0.9375rem",
+            color: "var(--text-secondary)",
+            lineHeight: 1.6,
+            marginBottom: "28px",
+            maxWidth: "780px",
+          }}
+        >
           Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define.
         </p>
 
-        {/* Architecture Sketch + Takeaways */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "var(--space-lg)", marginBottom: "var(--space-xl)" }}>
-          <div className="card" style={{ overflow: "hidden" }}>
-            <div style={{ padding: "var(--space-sm) var(--space-md)", background: "var(--surface-container)", borderBottom: "1px solid var(--aws-border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600 }}>Architecture Sketch</span>
-              <button className="tag tag--info">Live Preview</button>
-            </div>
+        {/* Key Takeaways Card Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 340px",
+            gap: "20px",
+            marginBottom: "32px",
+          }}
+        >
+          <div
+            style={{
+              background: "var(--navy)",
+              border: "1px solid var(--grid)",
+              borderRadius: "var(--radius-lg)",
+              padding: "20px",
+            }}
+          >
             <div
               style={{
-                height: "240px",
-                background: "var(--surface-container-low)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-                padding: "var(--space-lg)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.6875rem",
+                color: "var(--marker)",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: "12px",
               }}
             >
-              {/* VPC Diagram Mockup */}
-              <div style={{ border: "2px dashed var(--outline-variant)", borderRadius: "var(--radius-lg)", padding: "var(--space-lg)", width: "100%", maxWidth: "400px" }}>
-                <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--on-surface-variant)", margin: "0 0 var(--space-md)", fontFamily: "'JetBrains Mono', monospace" }}>
-                  VPC (10.0.0.0/16)
-                </p>
-                <div style={{ display: "flex", gap: "var(--space-md)" }}>
-                  <div style={{ flex: 1, padding: "var(--space-sm)", background: "rgba(0, 98, 160, 0.08)", borderRadius: "var(--radius-md)", border: "1px solid rgba(0, 98, 160, 0.2)", textAlign: "center" }}>
-                    <span style={{ fontSize: "10px", color: "var(--secondary)", fontWeight: 600 }}>Public Subnets</span>
-                  </div>
-                  <div style={{ flex: 1, padding: "var(--space-sm)", background: "rgba(255, 153, 0, 0.08)", borderRadius: "var(--radius-md)", border: "1px solid rgba(255, 153, 0, 0.2)", textAlign: "center" }}>
-                    <span style={{ fontSize: "10px", color: "var(--primary)", fontWeight: 600 }}>Private Subnets</span>
-                  </div>
+              Visual Blueprint Reference
+            </div>
+
+            <div
+              style={{
+                background: "var(--navy-deep)",
+                border: "1px solid var(--grid)",
+                borderRadius: "var(--radius-md)",
+                padding: "20px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.75rem",
+                  color: "var(--white-line)",
+                  marginBottom: "12px",
+                }}
+              >
+                VPC (10.0.0.0/16)
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div
+                  style={{
+                    padding: "12px",
+                    background: "rgba(56, 189, 248, 0.1)",
+                    border: "1px solid var(--accent-blue)",
+                    borderRadius: "var(--radius-sm)",
+                    textAlign: "center",
+                  }}
+                >
+                  <span style={{ fontSize: "0.75rem", color: "var(--accent-blue)", fontWeight: 600 }}>
+                    Public Subnets (10.0.1.0/24)
+                  </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-lg)", marginTop: "var(--space-md)" }}>
-                  <div style={{ textAlign: "center" }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: "32px", color: "var(--outline)" }}>router</span>
-                    <p style={{ fontSize: "9px", color: "var(--on-surface-variant)", margin: "2px 0 0" }}>Internet Gateway</p>
-                  </div>
-                  <div style={{ textAlign: "center" }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: "32px", color: "var(--outline)" }}>swap_vert</span>
-                    <p style={{ fontSize: "9px", color: "var(--on-surface-variant)", margin: "2px 0 0" }}>NAT Gateway</p>
-                  </div>
+
+                <div
+                  style={{
+                    padding: "12px",
+                    background: "rgba(232, 135, 30, 0.1)",
+                    border: "1px solid var(--marker)",
+                    borderRadius: "var(--radius-sm)",
+                    textAlign: "center",
+                  }}
+                >
+                  <span style={{ fontSize: "0.75rem", color: "var(--marker)", fontWeight: 600 }}>
+                    Private Subnets (10.0.2.0/24)
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Key Takeaways */}
-          <div>
-            <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "var(--space-md)" }}>Key Takeaways</h3>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+          <div
+            style={{
+              background: "var(--navy)",
+              border: "1px solid var(--grid)",
+              borderRadius: "var(--radius-lg)",
+              padding: "20px",
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "var(--white-line)",
+                margin: "0 0 12px",
+              }}
+            >
+              Key Takeaways
+            </h3>
+
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                fontSize: "0.8125rem",
+                color: "var(--text-secondary)",
+              }}
+            >
               {[
-                "One VPC spans multiple AZs in a Region.",
-                "Subnets are mapped to specific AZs.",
-                "Default VPC limits are 5 per region.",
+                "One VPC spans multiple Availability Zones in a Region.",
                 "Public subnets require an Internet Gateway (IGW).",
-                "Private subnets use NAT Gateway for outbound access.",
-              ].map((point, i) => (
-                <li key={i} style={{ display: "flex", gap: "var(--space-sm)", fontSize: "13px", color: "var(--on-surface-variant)" }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "var(--primary-container)", flexShrink: 0, marginTop: "2px" }}>check_circle</span>
-                  {point}
+                "Private subnets route outbound via NAT Gateway.",
+                "Default VPC soft quota is 5 per region.",
+              ].map((pt, i) => (
+                <li key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                  <CheckCircle2 size={16} color="var(--accent-emerald)" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>{pt}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* Implementation with Terraform */}
-        <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "var(--space-md)" }}>Implementation with Terraform</h2>
-        <div className="card" style={{ overflow: "hidden", marginBottom: "var(--space-lg)" }}>
-          <div style={{ padding: "var(--space-sm) var(--space-md)", background: "var(--surface-container)", borderBottom: "1px solid var(--aws-border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: "var(--secondary)" }}>main.tf</span>
+        {/* HCL Terraform Sample */}
+        <div
+          style={{
+            background: "var(--navy)",
+            border: "1px solid var(--grid)",
+            borderRadius: "var(--radius-lg)",
+            overflow: "hidden",
+            marginBottom: "32px",
+          }}
+        >
+          <div
+            style={{
+              padding: "10px 16px",
+              background: "var(--navy-deep)",
+              borderBottom: "1px solid var(--grid)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.75rem",
+              color: "var(--marker)",
+            }}
+          >
+            <span>main.tf (HCL Reference)</span>
             <button
+              onClick={handleCopy}
               style={{
-                background: "var(--primary-container)",
-                color: "var(--on-primary-container)",
-                border: "none",
-                padding: "4px 12px",
-                borderRadius: "var(--radius-md)",
-                fontSize: "11px",
-                fontWeight: 700,
+                background: "rgba(29, 78, 122, 0.4)",
+                border: "1px solid var(--grid)",
+                color: "var(--white-line)",
+                padding: "3px 10px",
+                borderRadius: "var(--radius-sm)",
+                fontSize: "0.6875rem",
+                fontFamily: "var(--font-mono)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 gap: "4px",
               }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>content_copy</span>
-              Copy
+              {copied ? <Check size={12} color="var(--accent-emerald)" /> : <Copy size={12} />}
+              {copied ? "Copied!" : "Copy"}
             </button>
           </div>
+
           <div
-            className="code-block"
             style={{
-              padding: "var(--space-md)",
-              background: "#1e2631",
-              color: "#d3e4fe",
+              padding: "16px",
+              background: "var(--navy-deep)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.8125rem",
+              color: "var(--paper)",
+              lineHeight: 1.6,
             }}
           >
-            <pre style={{ margin: 0, fontSize: "12px", lineHeight: "20px" }}>
+            <pre style={{ margin: 0 }}>
 {`resource "aws_vpc" "main" {
-  cidr_block         = "10.0.0.0/16"
-  instance_tenancy   = "default"
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
 
   tags = {
     Name = "Production-VPC"
@@ -228,83 +403,9 @@ export default function KnowledgeHubPage() {
 resource "aws_subnet" "public" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.0/24"
-
-  tags = { Name = "Public-Subnet-A11" }
 }`}
             </pre>
           </div>
-        </div>
-
-        {/* Expert Tip */}
-        <div
-          style={{
-            background: "rgba(255, 153, 0, 0.06)",
-            border: "1px solid rgba(255, 153, 0, 0.2)",
-            borderRadius: "var(--radius-lg)",
-            padding: "var(--space-md)",
-            marginBottom: "var(--space-xl)",
-            display: "flex",
-            alignItems: "start",
-            gap: "var(--space-sm)",
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ color: "var(--primary-container)", fontSize: "20px", flexShrink: 0 }}>tips_and_updates</span>
-          <div>
-            <p style={{ fontSize: "13px", fontWeight: 600, margin: "0 0 4px" }}>Expert Tip</p>
-            <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", margin: 0 }}>
-              Always enable <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", background: "var(--surface-container)", padding: "1px 4px", borderRadius: "2px" }}>dns_hostnames</code> and <code style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", background: "var(--surface-container)", padding: "1px 4px", borderRadius: "2px" }}>dns_support</code> in your VPC configuration to ensure proper service discovery within the cloud environment.
-            </p>
-          </div>
-        </div>
-
-        {/* Comparison Table */}
-        <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "var(--space-md)" }}>Comparison: NACLs vs Security Groups</h2>
-        <div className="card" style={{ overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-            <thead>
-              <tr style={{ background: "var(--surface-container)" }}>
-                {["Feature", "Security Groups", "Network ACLs"].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      padding: "10px 16px",
-                      textAlign: "left",
-                      fontWeight: 600,
-                      fontSize: "12px",
-                      borderBottom: "2px solid var(--outline-variant)",
-                      color: "var(--on-surface)",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Scope", "Instance Level", "Subnet Level"],
-                ["Stateful?", "Yes (Stateful)", "No (Stateless)"],
-                ["Default", "Allow rules only", "Allow & Deny rules"],
-                ["Rules", "Allow rules only", "Allow & Deny rules"],
-              ].map((row, i) => (
-                <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td
-                      key={j}
-                      style={{
-                        padding: "10px 16px",
-                        borderBottom: "1px solid var(--aws-border-color)",
-                        color: j === 0 ? "var(--on-surface)" : "var(--on-surface-variant)",
-                        fontWeight: j === 0 ? 600 : 400,
-                      }}
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

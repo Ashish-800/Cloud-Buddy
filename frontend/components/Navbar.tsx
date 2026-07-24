@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Cpu, Activity, Search, History, Clock, Command } from "lucide-react";
+import React from "react";
+import { Cpu, Search, User } from "lucide-react";
 import ProviderSelector, { type CloudProvider } from "./ProviderSelector";
 
 export type ConnectionStatus = "idle" | "processing" | "active" | "error";
@@ -22,47 +21,7 @@ export default function Navbar({
   provider = "AWS",
   onProviderSelect,
   onOpenCommandPalette,
-  onOpenHistory,
 }: NavbarProps) {
-  const [timeStr, setTimeStr] = useState("");
-
-  // Live UTC system clock
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeStr(now.toISOString().substring(11, 19) + " UTC");
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const getStatusText = () => {
-    switch (status) {
-      case "processing":
-        return "Analyzing Sketch...";
-      case "active":
-        return "Gemma 4 Connected";
-      case "error":
-        return "Connection Error";
-      default:
-        return "System Ready";
-    }
-  };
-
-  const getStatusDotClass = () => {
-    switch (status) {
-      case "processing":
-        return "status-dot--processing";
-      case "active":
-        return "status-dot--active";
-      case "error":
-        return "status-dot--error";
-      default:
-        return "status-dot--idle";
-    }
-  };
-
   return (
     <header
       style={{
@@ -70,7 +29,7 @@ export default function Navbar({
         top: 0,
         zIndex: 50,
         width: "100%",
-        height: "56px",
+        height: "52px",
         background: "var(--navy-deep)",
         borderBottom: "1px solid var(--grid)",
         display: "flex",
@@ -80,149 +39,141 @@ export default function Navbar({
         userSelect: "none",
       }}
     >
-      {/* ── Left: Session Breadcrumbs & Provider Selector ─────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <div
+      {/* ── 1. Current Project Name & Region (No "PROJECT" label) ──────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "0.875rem",
+            fontWeight: 700,
+            color: "var(--white-line)",
+          }}
+        >
+          Production Architecture
+        </span>
+        <span style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>·</span>
+        <span
           style={{
             fontFamily: "var(--font-mono)",
             fontSize: "0.75rem",
-            color: "var(--text-secondary)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
+            color: "var(--text-muted)",
           }}
         >
-          <span style={{ color: "var(--marker)", fontWeight: 700 }}>PROJECT</span>
-          <span style={{ color: "var(--grid)" }}>/</span>
-          <span style={{ color: "var(--white-line)" }}>US-East-1 Production Architecture</span>
-        </div>
+          US-East-1
+        </span>
+      </div>
 
-        {onProviderSelect && (
+      {/* ── 2. Centered Cloud Provider Switcher ────────────────────────── */}
+      {onProviderSelect && (
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <ProviderSelector
             selected={provider}
             onSelect={onProviderSelect}
+            showLabel={false}
           />
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* ── Center: Quick Command Search Palette Trigger ───────────────── */}
-      <button
-        onClick={onOpenCommandPalette}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          padding: "6px 14px",
-          background: "var(--navy)",
-          border: "1px solid var(--grid)",
-          borderRadius: "var(--radius-sm)",
-          color: "var(--text-muted)",
-          fontSize: "0.75rem",
-          fontFamily: "var(--font-mono)",
-          cursor: "pointer",
-          transition: "all 0.15s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "var(--marker)";
-          e.currentTarget.style.color = "var(--white-line)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "var(--grid)";
-          e.currentTarget.style.color = "var(--text-muted)";
-        }}
-      >
-        <Search size={14} color="var(--marker)" />
-        <span>Search commands or actions...</span>
-        <span
+      {/* ── 3. Compact Search, Active Model, Status Dot & Profile ──────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        {/* Global Search (Ctrl + K) */}
+        <button
+          type="button"
+          onClick={onOpenCommandPalette}
           style={{
-            padding: "2px 6px",
-            background: "rgba(29, 78, 122, 0.4)",
-            borderRadius: "3px",
-            fontSize: "0.625rem",
-            color: "var(--text-secondary)",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            height: "30px",
+            padding: "0 10px",
+            background: "var(--navy)",
+            border: "1px solid var(--grid)",
+            borderRadius: "var(--radius-sm)",
+            color: "var(--text-muted)",
+            fontSize: "0.75rem",
+            fontFamily: "var(--font-mono)",
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "var(--marker)";
+            e.currentTarget.style.color = "var(--white-line)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "var(--grid)";
+            e.currentTarget.style.color = "var(--text-muted)";
           }}
         >
-          Ctrl + K
-        </span>
-      </button>
+          <Search size={13} color="var(--marker)" />
+          <span>Search</span>
+          <span
+            style={{
+              padding: "1px 5px",
+              background: "rgba(29, 78, 122, 0.4)",
+              borderRadius: "3px",
+              fontSize: "0.625rem",
+              color: "var(--text-secondary)",
+            }}
+          >
+            Ctrl + K
+          </span>
+        </button>
 
-      {/* ── Right: AI Model Status, Clock & Controls ──────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-        {/* Model Badge */}
+        {/* Active AI Model */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "6px",
-            padding: "4px 10px",
-            borderRadius: "var(--radius-sm)",
-            background: "var(--navy)",
-            border: "1px solid var(--grid)",
-            fontSize: "0.6875rem",
+            fontSize: "0.75rem",
             color: "var(--text-secondary)",
             fontFamily: "var(--font-mono)",
           }}
         >
           <Cpu size={13} color="var(--marker)" />
           <span>{modelName}</span>
-          <span
-            style={{
-              padding: "1px 5px",
-              borderRadius: "3px",
-              background: "rgba(76, 175, 125, 0.15)",
-              color: "var(--accent-emerald)",
-              fontWeight: 700,
-              fontSize: "0.5625rem",
-            }}
-          >
-            128K
-          </span>
         </div>
 
-        {/* Live Status Dot */}
+        {/* Small Green Status Dot (Subtle "● Ready") */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "6px",
             fontSize: "0.75rem",
             fontFamily: "var(--font-mono)",
             color: "var(--text-secondary)",
           }}
         >
-          <span className={`status-dot ${getStatusDotClass()}`} />
-          <span>{getStatusText()}</span>
+          <span
+            style={{
+              width: "7px",
+              height: "7px",
+              borderRadius: "50%",
+              background: "var(--accent-emerald)",
+              boxShadow: "0 0 8px rgba(76, 175, 125, 0.5)",
+            }}
+          />
+          <span>Ready</span>
         </div>
 
-        {/* History Icon Trigger */}
-        <button
-          onClick={onOpenHistory}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: "var(--text-muted)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-          }}
-          title="Session History"
-        >
-          <History size={16} />
-        </button>
-
-        {/* UTC Clock */}
+        {/* User Profile */}
         <div
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "0.6875rem",
-            color: "var(--text-muted)",
+            width: 26,
+            height: 26,
+            borderRadius: "50%",
+            background: "rgba(232, 135, 30, 0.15)",
+            border: "1px solid var(--marker)",
             display: "flex",
             alignItems: "center",
-            gap: "4px",
+            justifyContent: "center",
+            color: "var(--marker)",
+            cursor: "pointer",
           }}
+          title="Architect Account"
         >
-          <Clock size={12} color="var(--marker)" />
-          <span>{timeStr}</span>
+          <User size={13} />
         </div>
       </div>
     </header>

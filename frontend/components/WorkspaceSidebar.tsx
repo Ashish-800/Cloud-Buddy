@@ -1,50 +1,49 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import {
   Layout,
-  FolderGit2,
   History,
   ShieldCheck,
-  FileCode,
-  Download,
-  Settings,
-  Sparkles,
   User,
-  Sliders,
   Compass,
+  ChevronLeft,
+  ChevronRight,
+  PlusCircle,
 } from "lucide-react";
 import CloudBuddyLogo from "./CloudBuddyLogo";
 
 interface SidebarProps {
   onOpenHistory?: () => void;
   onOpenCommandPalette?: () => void;
+  onNewSession?: () => void;
 }
 
 export default function WorkspaceSidebar({
   onOpenHistory,
   onOpenCommandPalette,
+  onNewSession,
 }: SidebarProps) {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
     { label: "Workbench", href: "/workbench", icon: Layout },
     { label: "Knowledge Hub", href: "/knowledge", icon: Compass },
-    { label: "Deployment & Validation", href: "/deploy", icon: ShieldCheck },
+    { label: "Deployment", href: "/deploy", icon: ShieldCheck },
   ];
 
   const actionItems = [
+    { label: "New Session", icon: PlusCircle, onClick: onNewSession },
     { label: "Session History", icon: History, onClick: onOpenHistory },
-    { label: "Command Palette (Ctrl+K)", icon: Sliders, onClick: onOpenCommandPalette },
   ];
 
   return (
     <aside
       style={{
-        width: "240px",
+        width: isCollapsed ? "60px" : "220px",
         background: "var(--navy-deep)",
         borderRight: "1px solid var(--grid)",
         display: "flex",
@@ -55,78 +54,83 @@ export default function WorkspaceSidebar({
         zIndex: 40,
         flexShrink: 0,
         userSelect: "none",
+        transition: "width 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
-      {/* ── Brand Stamp Header ────────────────────────────────────────── */}
+      {/* ── Header ──────────────────────────────────────────────────── */}
       <div
         style={{
-          padding: "18px 16px",
+          padding: isCollapsed ? "14px 8px" : "14px 16px",
           borderBottom: "1px solid var(--grid)",
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          justifyContent: isCollapsed ? "center" : "space-between",
           background: "var(--navy)",
+          height: "52px",
         }}
       >
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <CloudBuddyLogo size={36} showText={false} />
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "8px" }}>
+          <CloudBuddyLogo size={28} showText={false} />
+          {!isCollapsed && (
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "0.875rem",
+                fontWeight: 700,
+                color: "var(--white-line)",
+                margin: 0,
+              }}
+            >
+              Cloud Buddy
+            </h2>
+          )}
         </Link>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h2
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "0.9375rem",
-              fontWeight: 700,
-              color: "var(--white-line)",
-              margin: 0,
-              letterSpacing: "-0.01em",
-              lineHeight: 1.2,
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            Cloud Buddy
-          </h2>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
-              color: "var(--marker)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Drafting Studio
-          </span>
-        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "var(--text-muted)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            padding: "2px",
+          }}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+        </button>
       </div>
 
-      {/* ── Navigation Section ────────────────────────────────────────── */}
+      {/* ── Navigation List ───────────────────────────────────────────── */}
       <div
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "16px 12px",
+          padding: "16px 8px",
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: "24px",
         }}
       >
         <div>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              color: "var(--text-muted)",
-              marginBottom: "8px",
-              paddingLeft: "8px",
-            }}
-          >
-            Primary Workspace
-          </div>
+          {!isCollapsed && (
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.625rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "var(--text-muted)",
+                marginBottom: "8px",
+                paddingLeft: "8px",
+              }}
+            >
+              Workspace
+            </div>
+          )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {navItems.map((item) => {
@@ -135,14 +139,16 @@ export default function WorkspaceSidebar({
               return (
                 <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
                   <div
+                    title={isCollapsed ? item.label : undefined}
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: isCollapsed ? "center" : "flex-start",
                       gap: "10px",
-                      padding: "8px 12px",
+                      padding: "8px 10px",
                       borderRadius: "var(--radius-sm)",
                       fontSize: "0.8125rem",
-                      fontWeight: isActive ? 600 : 500,
+                      fontWeight: isActive ? 600 : 400,
                       color: isActive ? "var(--marker)" : "var(--text-secondary)",
                       background: isActive ? "rgba(232, 135, 30, 0.12)" : "transparent",
                       borderLeft: isActive ? "2px solid var(--marker)" : "2px solid transparent",
@@ -151,7 +157,7 @@ export default function WorkspaceSidebar({
                     }}
                   >
                     <Icon size={16} color={isActive ? "var(--marker)" : "var(--text-muted)"} />
-                    <span>{item.label}</span>
+                    {!isCollapsed && <span>{item.label}</span>}
                   </div>
                 </Link>
               );
@@ -159,21 +165,23 @@ export default function WorkspaceSidebar({
           </div>
         </div>
 
-        {/* ── Quick Tools Section ──────────────────────────────────────── */}
+        {/* ── Session Tools ───────────────────────────────────────────── */}
         <div>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              color: "var(--text-muted)",
-              marginBottom: "8px",
-              paddingLeft: "8px",
-            }}
-          >
-            Engineering Tools
-          </div>
+          {!isCollapsed && (
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.625rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "var(--text-muted)",
+                marginBottom: "8px",
+                paddingLeft: "8px",
+              }}
+            >
+              Session
+            </div>
+          )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {actionItems.map((item, idx) => {
@@ -182,14 +190,16 @@ export default function WorkspaceSidebar({
                 <div
                   key={idx}
                   onClick={item.onClick}
+                  title={isCollapsed ? item.label : undefined}
                   style={{
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: isCollapsed ? "center" : "flex-start",
                     gap: "10px",
-                    padding: "8px 12px",
+                    padding: "8px 10px",
                     borderRadius: "var(--radius-sm)",
                     fontSize: "0.8125rem",
-                    fontWeight: 500,
+                    fontWeight: 400,
                     color: "var(--text-secondary)",
                     cursor: "pointer",
                     transition: "all 0.15s ease",
@@ -204,96 +214,75 @@ export default function WorkspaceSidebar({
                   }}
                 >
                   <Icon size={16} color="var(--text-muted)" />
-                  <span style={{ flex: 1 }}>{item.label}</span>
+                  {!isCollapsed && <span style={{ flex: 1 }}>{item.label}</span>}
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* ── System Blueprint Stamp Card ─────────────────────────────── */}
-        <div
-          style={{
-            marginTop: "auto",
-            padding: "12px",
-            background: "rgba(11, 37, 69, 0.6)",
-            border: "1px solid var(--grid)",
-            borderRadius: "var(--radius-sm)",
-            fontFamily: "var(--font-mono)",
-            fontSize: "0.6875rem",
-            color: "var(--text-secondary)",
-          }}
-        >
+        {/* Subtle DWG Stamp (Expanded mode) */}
+        {!isCollapsed && (
           <div
             style={{
+              marginTop: "auto",
+              padding: "8px 10px",
+              background: "transparent",
+              borderTop: "1px solid rgba(29, 78, 122, 0.3)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.625rem",
+              color: "var(--text-muted)",
               display: "flex",
               justifyContent: "space-between",
-              marginBottom: "4px",
-              color: "var(--marker)",
-              fontWeight: 700,
             }}
           >
-            <span>DWG: CB-2026</span>
-            <span>REV 2.4</span>
+            <span>DWG CB-2026</span>
+            <span>REV 2.5</span>
           </div>
-          <div style={{ color: "var(--text-muted)", fontSize: "0.625rem" }}>
-            Gemma 4 Multimodal Engine
-          </div>
-          <div style={{ color: "var(--text-muted)", fontSize: "0.625rem" }}>
-            AWS · GCP · Azure CAD Engine
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* ── User Profile Drawer Footer ───────────────────────────────── */}
+      {/* ── Footer User Status ───────────────────────────────────────── */}
       <div
         style={{
-          padding: "12px 14px",
+          padding: "10px 12px",
           borderTop: "1px solid var(--grid)",
           background: "var(--navy)",
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          justifyContent: isCollapsed ? "center" : "flex-start",
+          gap: "8px",
         }}
       >
         <div
           style={{
-            width: 28,
-            height: 28,
+            width: 24,
+            height: 24,
             borderRadius: "50%",
-            background: "rgba(232, 135, 30, 0.2)",
+            background: "rgba(232, 135, 30, 0.15)",
             border: "1px solid var(--marker)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: "var(--marker)",
+            flexShrink: 0,
           }}
         >
-          <User size={14} />
+          <User size={12} />
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
+        {!isCollapsed && (
+          <span
             style={{
               fontSize: "0.75rem",
-              fontWeight: 600,
-              color: "var(--white-line)",
+              color: "var(--text-secondary)",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
           >
-            Architect Workspace
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.625rem",
-              color: "var(--text-muted)",
-            }}
-          >
-            Connected to Supabase
-          </div>
-        </div>
+            Architect Studio
+          </span>
+        )}
       </div>
     </aside>
   );

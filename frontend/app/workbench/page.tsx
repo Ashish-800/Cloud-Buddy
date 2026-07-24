@@ -10,9 +10,11 @@ import {
   ChevronRight,
   StopCircle,
   ShieldCheck,
+  RotateCcw,
   BrainCircuit,
-  Maximize2,
-  RefreshCw,
+  SlidersHorizontal,
+  X,
+  Layers,
 } from "lucide-react";
 
 import Navbar, { type ConnectionStatus } from "@/components/Navbar";
@@ -29,15 +31,16 @@ import SessionHistoryDrawer from "@/components/SessionHistoryDrawer";
 import { type CloudProvider } from "@/components/ProviderSelector";
 import { useCloudCanvasStream } from "@/hooks/useCloudCanvasStream";
 
-type RightTabId = "critique" | "terraform" | "compliance";
+type ViewStage = "upload" | "analyzing" | "diagram" | "critique" | "terraform" | "compliance";
 
 export default function WorkbenchPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [complianceFile, setComplianceFile] = useState<File | null>(null);
   const [provider, setProvider] = useState<CloudProvider>("AWS");
-  const [activeRightTab, setActiveRightTab] = useState<RightTabId>("critique");
+  const [activeStage, setActiveStage] = useState<ViewStage>("upload");
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(false);
 
-  // Modals / Drawers state
+  // Modals & Drawers state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
@@ -52,16 +55,23 @@ export default function WorkbenchPage() {
     ? "active"
     : "idle";
 
-  const hasResults =
-    stream.critiqueText !== null ||
-    stream.mermaidCode !== null ||
-    stream.terraformCode !== null;
-
-  // Analysis Handlers
+  // Handle Analysis Trigger
   const handleAnalyze = useCallback(async () => {
     if (!imageFile) return;
+    setActiveStage("analyzing");
+    setIsRightPanelOpen(true);
     await stream.startAnalysis(imageFile, complianceFile, provider);
+    setActiveStage("diagram");
   }, [imageFile, complianceFile, provider, stream]);
+
+  // Handle Reset / New Session
+  const handleNewSession = useCallback(() => {
+    setImageFile(null);
+    setComplianceFile(null);
+    stream.reset();
+    setActiveStage("upload");
+    setIsRightPanelOpen(false);
+  }, [stream]);
 
   const handleAbort = useCallback(() => {
     stream.abort();
@@ -73,7 +83,7 @@ export default function WorkbenchPage() {
         if (imageFile) handleAnalyze();
         break;
       case "export_tf":
-        setActiveRightTab("terraform");
+        setActiveStage("terraform");
         break;
       case "history":
         setIsHistoryOpen(true);
@@ -101,13 +111,14 @@ export default function WorkbenchPage() {
         overflow: "hidden",
       }}
     >
-      {/* ── 1. LEFT SIDEBAR: Compact Blueprint Navigation Rail ───────── */}
+      {/* ── 1. LEFT SIDEBAR: Collapsible Blueprint Rail ───────────────── */}
       <WorkspaceSidebar
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onNewSession={handleNewSession}
       />
 
-      {/* ── MAIN CONTENT AREA ─────────────────────────────────────────── */}
+      {/* ── MAIN WORKSPACE CONTENT AREA ───────────────────────────────── */}
       <div
         style={{
           flex: 1,
@@ -118,7 +129,7 @@ export default function WorkbenchPage() {
           overflow: "hidden",
         }}
       >
-        {/* ── 2. TOP HEADER ───────────────────────────────────────────── */}
+        {/* ── 2. TOP HEADER BAR ───────────────────────────────────────── */}
         <Navbar
           status={connectionStatus}
           modelName="gemma-4-31b-it"
@@ -128,295 +139,336 @@ export default function WorkbenchPage() {
           onOpenHistory={() => setIsHistoryOpen(true)}
         />
 
-        {/* ── 3. WORKSPACE 2-COLUMN MAIN CANVAS & INTELLIGENCE SPLIT ──── */}
+        {/* ── 3. STAGE MODE NAVIGATION BAR (Appears post-upload) ─────── */}
+        {activeStage !== "upload" && (
+          <div
+            style={{
+              padding: "0 20px",
+              background: "var(--navy-deep)",
+              borderBottom: "1px solid var(--grid)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              height: "44px",
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ display: "flex", gap: "6px" }}>
+              {[
+                { id: "diagram", label: "Interactive Diagram", icon: GitGraph },
+                { id: "critique", label: "Critique Findings", icon: MessageSquareWarning },
+                { id: "terraform", label: "Terraform IDE", icon: FileCode2 },
+                { id: "compliance", label: "Compliance Audit", icon: ShieldCheck },
+              ].map((stage) => {
+                const Icon = stage.icon;
+                const isActive = activeStage === stage.id;
+                return (
+                  <button
+                    key={stage.id}
+                    onClick={() => setActiveStage(stage.id as ViewStage)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "6px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      fontFamily: "var(--font-display)",
+                      fontSize: "0.75rem",
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? "var(--marker)" : "var(--text-muted)",
+                      background: isActive ? "rgba(232, 135, 30, 0.12)" : "transparent",
+                      border: "none",
+                      borderBottom: isActive ? "2px solid var(--marker)" : "2px solid transparent",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <Icon size={14} color={isActive ? "var(--marker)" : "var(--text-muted)"} />
+                    {stage.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <button
+                onClick={handleNewSession}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "4px 10px",
+                  background: "rgba(29, 78, 122, 0.3)",
+                  border: "1px solid var(--grid)",
+                  borderRadius: "var(--radius-sm)",
+                  fontSize: "0.6875rem",
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--text-secondary)",
+                  cursor: "pointer",
+                }}
+              >
+                <RotateCcw size={12} /> New Sketch
+              </button>
+
+              <button
+                onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "4px 10px",
+                  background: isRightPanelOpen ? "rgba(232, 135, 30, 0.15)" : "rgba(29, 78, 122, 0.3)",
+                  border: `1px solid ${isRightPanelOpen ? "var(--marker)" : "var(--grid)"}`,
+                  borderRadius: "var(--radius-sm)",
+                  fontSize: "0.6875rem",
+                  fontFamily: "var(--font-mono)",
+                  color: isRightPanelOpen ? "var(--marker)" : "var(--text-secondary)",
+                  cursor: "pointer",
+                }}
+              >
+                <BrainCircuit size={13} />
+                <span>AI Intelligence</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── 4. PROGRESSIVE DISCLOSURE STAGE WORKSPACE ───────────────── */}
         <main
           style={{
             flex: 1,
-            display: "grid",
-            gridTemplateColumns: "1fr 420px",
-            gap: "16px",
-            padding: "16px",
+            display: "flex",
             overflow: "hidden",
+            position: "relative",
             background: "var(--navy-deep)",
           }}
         >
-          {/* ── CENTER WORKSPACE: Interactive Drafting Board & Diagram Canvas ── */}
-          <section
+          {/* ── MAIN CENTERPIECE CANVAS (Fills 100% when right panel collapsed) ── */}
+          <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-              minWidth: 0,
+              flex: 1,
               height: "100%",
               overflowY: "auto",
+              padding: activeStage === "upload" ? "40px 24px" : "16px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: activeStage === "upload" ? "center" : "stretch",
+              justifyContent: activeStage === "upload" ? "center" : "flex-start",
+              minWidth: 0,
             }}
           >
-            {/* Interactive Upload Drafting Board */}
-            <DraftingBoard
-              onFileSelect={setImageFile}
-              selectedFile={imageFile}
-              isStreaming={stream.isStreaming}
-            />
-
-            {/* Analysis Trigger Control Bar */}
-            <div
-              style={{
-                display: "flex",
-                gap: "12px",
-                alignItems: "center",
-                background: "var(--navy)",
-                border: "1px solid var(--grid)",
-                borderRadius: "var(--radius-md)",
-                padding: "12px 16px",
-              }}
-            >
-              {stream.isStreaming ? (
-                <button
-                  type="button"
-                  onClick={handleAbort}
-                  style={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                    padding: "12px",
-                    background: "rgba(232, 90, 90, 0.15)",
-                    border: "1px solid var(--accent-rose)",
-                    borderRadius: "var(--radius-sm)",
-                    color: "var(--accent-rose)",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.875rem",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  <StopCircle size={16} /> Stop Gemma 4 Analysis
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled={!imageFile}
-                  onClick={handleAnalyze}
-                  style={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                    padding: "12px",
-                    background: imageFile ? "var(--marker)" : "rgba(29, 78, 122, 0.4)",
-                    border: "none",
-                    borderRadius: "var(--radius-sm)",
-                    color: imageFile ? "var(--navy-deep)" : "var(--text-muted)",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "0.875rem",
-                    fontWeight: 700,
-                    cursor: imageFile ? "pointer" : "not-allowed",
-                    boxShadow: imageFile ? "var(--glow-marker)" : "none",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <Sparkles size={16} />
-                  Analyze Architecture & Stream Code
-                  <ChevronRight size={16} />
-                </button>
-              )}
-            </div>
-
-            {/* Error Notification */}
-            <AnimatePresence>
-              {stream.error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  style={{
-                    padding: "12px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--accent-rose)",
-                    background: "rgba(232, 90, 90, 0.12)",
-                    fontSize: "0.8125rem",
-                    color: "var(--accent-rose)",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {stream.error}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Diagram Canvas Container */}
-            <div
-              style={{
-                flex: 1,
-                minHeight: "360px",
-                background: "var(--navy)",
-                border: "1px solid var(--grid)",
-                borderRadius: "var(--radius-lg)",
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
+            {/* ── STAGE 1: INITIAL UPLOAD (Serene & Spacious Focal Point) ── */}
+            {activeStage === "upload" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
                 style={{
-                  padding: "10px 16px",
-                  background: "var(--navy-deep)",
-                  borderBottom: "1px solid var(--grid)",
+                  width: "100%",
+                  maxWidth: "760px",
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  flexDirection: "column",
+                  gap: "20px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <GitGraph size={16} color="var(--marker)" />
-                  <span
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "0.875rem",
-                      fontWeight: 700,
-                      color: "var(--white-line)",
-                    }}
-                  >
-                    Interactive Architecture Canvas (Mermaid / CAD)
-                  </span>
-                </div>
+                <DraftingBoard
+                  onFileSelect={setImageFile}
+                  selectedFile={imageFile}
+                  isStreaming={stream.isStreaming}
+                />
 
-                {stream.detectedComponents.length > 0 && (
-                  <span
+                {/* Single Primary Action Button */}
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <motion.button
+                    whileHover={imageFile ? { scale: 1.02 } : undefined}
+                    whileTap={imageFile ? { scale: 0.98 } : undefined}
+                    disabled={!imageFile || stream.isStreaming}
+                    onClick={handleAnalyze}
                     style={{
+                      width: "100%",
+                      maxWidth: "480px",
+                      padding: "16px 28px",
+                      background: imageFile ? "var(--marker)" : "rgba(29, 78, 122, 0.3)",
+                      border: "none",
+                      borderRadius: "var(--radius-md)",
+                      color: imageFile ? "var(--navy-deep)" : "var(--text-muted)",
                       fontFamily: "var(--font-mono)",
-                      fontSize: "0.6875rem",
-                      color: "var(--marker)",
-                      padding: "2px 8px",
-                      borderRadius: "10px",
-                      background: "rgba(232, 135, 30, 0.12)",
-                      border: "1px solid var(--grid)",
+                      fontSize: "0.9375rem",
+                      fontWeight: 700,
+                      cursor: imageFile ? "pointer" : "not-allowed",
+                      boxShadow: imageFile ? "var(--glow-marker)" : "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "10px",
+                      transition: "all 0.2s ease",
                     }}
                   >
-                    {stream.detectedComponents.length} Nodes Identified
-                  </span>
-                )}
-              </div>
+                    <Sparkles size={18} />
+                    Analyze Architecture & Stream HCL
+                    <ChevronRight size={18} />
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
 
-              <div style={{ flex: 1, position: "relative" }}>
+            {/* ── STAGE 2: AI SCANNING & REASONING ───────────────────── */}
+            {activeStage === "analyzing" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "20px",
+                }}
+              >
+                <DraftingBoard
+                  onFileSelect={setImageFile}
+                  selectedFile={imageFile}
+                  isStreaming={true}
+                />
+              </motion.div>
+            )}
+
+            {/* ── STAGE 3: INTERACTIVE DIAGRAM CENTERPIECE ───────────── */}
+            {activeStage === "diagram" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  flex: 1,
+                  height: "100%",
+                  background: "var(--navy)",
+                  border: "1px solid var(--grid)",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 <DiagramCanvas
                   mermaidCode={stream.mermaidCode}
                   isLoading={stream.isStreaming && !stream.mermaidCode}
                 />
-              </div>
-            </div>
-          </section>
+              </motion.div>
+            )}
 
-          {/* ── RIGHT COLUMN: AI Intelligence, Critique & Terraform IDE ───── */}
-          <section
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-              height: "100%",
-              overflowY: "auto",
-            }}
-          >
-            {/* AI Intelligence Scores & Reasoning Feed */}
-            <AIReasoningPanel
-              isStreaming={stream.isStreaming}
-              critiqueData={stream.critiqueData}
-              detectedComponents={stream.detectedComponents}
-              activeModel={stream.activeModel}
-              activeProvider={stream.activeProvider}
-            />
-
-            {/* Right Tabbed Inspector Header */}
-            <div
-              style={{
-                background: "var(--navy)",
-                border: "1px solid var(--grid)",
-                borderRadius: "var(--radius-lg)",
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                flex: 1,
-                minHeight: "380px",
-              }}
-            >
-              {/* Tab Navigation */}
-              <div
+            {/* ── STAGE 4: ARCHITECTURAL CRITIQUE ─────────────────────── */}
+            {activeStage === "critique" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 style={{
-                  display: "flex",
-                  borderBottom: "1px solid var(--grid)",
-                  background: "var(--navy-deep)",
+                  flex: 1,
+                  background: "var(--navy)",
+                  border: "1px solid var(--grid)",
+                  borderRadius: "var(--radius-lg)",
+                  overflowY: "auto",
+                  padding: "16px",
                 }}
               >
-                {[
-                  { id: "critique", label: "Critique", icon: MessageSquareWarning },
-                  { id: "terraform", label: "Terraform IDE", icon: FileCode2 },
-                  { id: "compliance", label: "Compliance", icon: ShieldCheck },
-                ].map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeRightTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveRightTab(tab.id as RightTabId)}
-                      style={{
-                        flex: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "6px",
-                        padding: "12px 8px",
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.75rem",
-                        fontWeight: isActive ? 700 : 500,
-                        color: isActive ? "var(--marker)" : "var(--text-muted)",
-                        background: isActive ? "var(--navy)" : "transparent",
-                        border: "none",
-                        borderBottom: isActive ? "2px solid var(--marker)" : "2px solid transparent",
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      <Icon size={14} color={isActive ? "var(--marker)" : "var(--text-muted)"} />
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </div>
+                <CritiqueViewer
+                  markdown={stream.critiqueText}
+                  isLoading={stream.isStreaming && !stream.critiqueText}
+                />
+              </motion.div>
+            )}
 
-              {/* Tab Content Display */}
-              <div style={{ flex: 1, overflowY: "auto", position: "relative" }}>
-                {activeRightTab === "critique" && (
-                  <CritiqueViewer
-                    markdown={stream.critiqueText}
-                    isLoading={stream.isStreaming && !stream.critiqueText}
-                  />
-                )}
+            {/* ── STAGE 5: TERRAFORM HCL IDE ─────────────────────────── */}
+            {activeStage === "terraform" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  flex: 1,
+                  height: "100%",
+                }}
+              >
+                <CodeExporter
+                  code={stream.terraformCode}
+                  isLoading={stream.isStreaming && !stream.terraformCode}
+                />
+              </motion.div>
+            )}
 
-                {activeRightTab === "terraform" && (
-                  <CodeExporter
-                    code={stream.terraformCode}
-                    isLoading={stream.isStreaming && !stream.terraformCode}
-                  />
-                )}
+            {/* ── STAGE 6: COMPLIANCE AUDIT ──────────────────────────── */}
+            {activeStage === "compliance" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  flex: 1,
+                  background: "var(--navy)",
+                  border: "1px solid var(--grid)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "24px",
+                }}
+              >
+                <ComplianceUploader
+                  onFileSelect={setComplianceFile}
+                  selectedFile={complianceFile}
+                  disabled={stream.isStreaming}
+                />
+              </motion.div>
+            )}
+          </div>
 
-                {activeRightTab === "compliance" && (
-                  <div style={{ padding: "16px" }}>
-                    <ComplianceUploader
-                      onFileSelect={setComplianceFile}
-                      selectedFile={complianceFile}
-                      disabled={stream.isStreaming}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+          {/* ── RIGHT CONTEXT PANEL: Slides in only when requested ───── */}
+          <AnimatePresence>
+            {isRightPanelOpen && (
+              <motion.div
+                initial={{ x: "100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                style={{
+                  width: "360px",
+                  height: "100%",
+                  borderLeft: "1px solid var(--grid)",
+                  background: "var(--navy)",
+                  padding: "16px",
+                  overflowY: "auto",
+                  flexShrink: 0,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "16px",
+                    borderBottom: "1px solid var(--grid)",
+                    paddingBottom: "10px",
+                  }}
+                >
+                  <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "0.875rem" }}>
+                    AI Context & Telemetry
+                  </span>
+                  <button
+                    onClick={() => setIsRightPanelOpen(false)}
+                    style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <AIReasoningPanel
+                  isStreaming={stream.isStreaming}
+                  critiqueData={stream.critiqueData}
+                  detectedComponents={stream.detectedComponents}
+                  activeModel={stream.activeModel}
+                  activeProvider={stream.activeProvider}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
 
-      {/* ── MODALS & FLOATING CONTROLS ───────────────────────────────── */}
+      {/* ── MODALS & ASSISTANTS ──────────────────────────────────────── */}
       <ArchitectureMentorChat
         activeProvider={provider}
         score={stream.critiqueData?.score ?? null}
