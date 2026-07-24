@@ -2,91 +2,83 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Cpu, Activity, Zap } from "lucide-react";
-
-/* ── Types ────────────────────────────────────────────────────────────── */
+import { Cpu, Sparkles, Activity } from "lucide-react";
 
 export type ConnectionStatus = "idle" | "processing" | "active" | "error";
 
 interface NavbarProps {
-  /** Current connection/processing status for the neon indicator. */
-  status: ConnectionStatus;
+  status?: ConnectionStatus;
+  modelName?: string;
 }
 
-/* ── Status Mapping ───────────────────────────────────────────────────── */
+export default function Navbar({
+  status = "idle",
+  modelName = "gemma-4-31b-it",
+}: NavbarProps) {
+  const getStatusText = () => {
+    switch (status) {
+      case "processing":
+        return "Analyzing Sketch...";
+      case "active":
+        return "Gemma 4 Connected";
+      case "error":
+        return "Connection Error";
+      default:
+        return "System Ready";
+    }
+  };
 
-const STATUS_CONFIG: Record<
-  ConnectionStatus,
-  { label: string; dotClass: string; color: string }
-> = {
-  idle: {
-    label: "Ready",
-    dotClass: "status-dot status-dot--idle",
-    color: "var(--text-muted)",
-  },
-  processing: {
-    label: "Analyzing…",
-    dotClass: "status-dot status-dot--processing",
-    color: "var(--accent-cyan)",
-  },
-  active: {
-    label: "Connected",
-    dotClass: "status-dot status-dot--active",
-    color: "var(--accent-emerald)",
-  },
-  error: {
-    label: "Error",
-    dotClass: "status-dot status-dot--error",
-    color: "var(--accent-rose)",
-  },
-};
-
-/* ── Component ────────────────────────────────────────────────────────── */
-
-const Navbar: React.FC<NavbarProps> = ({ status }) => {
-  const cfg = STATUS_CONFIG[status];
+  const getStatusDotClass = () => {
+    switch (status) {
+      case "processing":
+        return "status-dot--processing";
+      case "active":
+        return "status-dot--active";
+      case "error":
+        return "status-dot--error";
+      default:
+        return "status-dot--idle";
+    }
+  };
 
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="glass-panel"
+      transition={{ duration: 0.4 }}
       style={{
         position: "sticky",
         top: 0,
         zIndex: 50,
+        width: "100%",
+        padding: "12px 24px",
+        background: "rgba(9, 13, 22, 0.85)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "12px 24px",
-        margin: "12px 16px 0",
-        borderRadius: "var(--radius-lg)",
       }}
     >
-      {/* ── Brand ──────────────────────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <div
+      {/* ── Brand & Title ────────────────────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+        <motion.div
+          whileHover={{ rotate: 180 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           style={{
             width: 40,
             height: 40,
             borderRadius: "var(--radius-md)",
-            background: "rgba(255, 255, 255, 0.06)",
-            border: "1px solid var(--glass-border)",
+            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+            boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            overflow: "hidden",
-            boxShadow: "0 0 12px rgba(56, 189, 248, 0.2)",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-icon.png"
-            alt="Cloud Buddy Logo"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        </div>
+          <Sparkles size={22} color="#ffffff" />
+        </motion.div>
 
         <div>
           <h1
@@ -94,72 +86,100 @@ const Navbar: React.FC<NavbarProps> = ({ status }) => {
               fontSize: "1.125rem",
               fontWeight: 700,
               letterSpacing: "-0.02em",
-              lineHeight: 1.2,
-              color: "var(--text-primary)",
+              color: "#f8fafc",
               margin: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            Cloud Buddy
+            CloudBuddy
+            <span
+              style={{
+                fontSize: "0.6875rem",
+                fontWeight: 600,
+                padding: "2px 8px",
+                borderRadius: "12px",
+                background: "rgba(99, 102, 241, 0.15)",
+                color: "#818cf8",
+                border: "1px solid rgba(99, 102, 241, 0.3)",
+              }}
+            >
+              v2.0 AI
+            </span>
           </h1>
           <p
             style={{
-              fontSize: "0.6875rem",
-              color: "var(--text-muted)",
+              fontSize: "0.75rem",
+              color: "#64748b",
               margin: 0,
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
+              letterSpacing: "0.02em",
             }}
           >
-            Your Friendly Cloud Companion
+            Multimodal Architecture Tutor & Infrastructure Engine
           </p>
         </div>
       </div>
 
-      {/* ── Center: Model Badge ────────────────────────────────────── */}
+      {/* ── Center: Gemma 4 Model Badge ──────────────────────────────── */}
       <motion.div
-        whileHover={{ scale: 1.03 }}
+        whileHover={{ scale: 1.02 }}
         style={{
           display: "flex",
           alignItems: "center",
           gap: "8px",
           padding: "6px 14px",
-          borderRadius: "999px",
-          border: "1px solid var(--glass-border)",
-          background: "rgba(99, 102, 241, 0.08)",
+          borderRadius: "var(--radius-xl)",
+          background: "rgba(15, 23, 42, 0.8)",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          fontSize: "0.8125rem",
+          fontWeight: 500,
+          color: "#cbd5e1",
         }}
       >
-        <Cpu size={14} color="var(--accent-indigo-light)" />
+        <Cpu size={15} color="#818cf8" />
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem" }}>
+          {modelName}
+        </span>
         <span
           style={{
-            fontSize: "0.75rem",
-            fontWeight: 600,
-            color: "var(--accent-indigo-light)",
-            fontFamily: "var(--font-mono), monospace",
+            fontSize: "0.625rem",
+            textTransform: "uppercase",
+            fontWeight: 700,
+            padding: "2px 6px",
+            borderRadius: "4px",
+            background: "rgba(16, 185, 129, 0.15)",
+            color: "#10b981",
           }}
         >
-          Gemma 4 · 12B Multimodal
+          128K Context
         </span>
       </motion.div>
 
-      {/* ── Right: Status Indicator ────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <Activity size={14} color="var(--text-muted)" />
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <span className={cfg.dotClass} />
-          <span
-            style={{
-              fontSize: "0.75rem",
-              fontWeight: 500,
-              color: cfg.color,
-              fontFamily: "var(--font-mono), monospace",
-            }}
-          >
-            {cfg.label}
-          </span>
-        </div>
+      {/* ── Right: Live Status Indicator ─────────────────────────────── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "6px 14px",
+          borderRadius: "var(--radius-md)",
+          background: "rgba(15, 23, 42, 0.6)",
+          border: "1px solid rgba(255, 255, 255, 0.06)",
+        }}
+      >
+        <span className={`status-dot ${getStatusDotClass()}`} />
+        <span
+          style={{
+            fontSize: "0.8125rem",
+            fontWeight: 500,
+            color: "#cbd5e1",
+          }}
+        >
+          {getStatusText()}
+        </span>
+        <Activity size={14} color="#64748b" style={{ marginLeft: 4 }} />
       </div>
     </motion.header>
   );
-};
-
-export default Navbar;
+}

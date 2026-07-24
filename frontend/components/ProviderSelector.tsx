@@ -2,125 +2,111 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-
-/* ── Types ────────────────────────────────────────────────────────────── */
+import { Cloud, Layers, Shield } from "lucide-react";
 
 export type CloudProvider = "AWS" | "GCP" | "Azure";
 
 interface ProviderSelectorProps {
-  /** Currently selected provider. */
   selected: CloudProvider;
-  /** Called when the user selects a provider. */
   onSelect: (provider: CloudProvider) => void;
-  /** Disable interaction during analysis. */
   disabled?: boolean;
 }
 
-/* ── Provider Config ──────────────────────────────────────────────────── */
-
-interface ProviderMeta {
+interface ProviderOption {
+  id: CloudProvider;
   label: string;
-  icon: string; /* emoji for simplicity – swap for SVG icons as needed */
-  accentGradient: string;
+  icon: React.ReactNode;
+  activeColor: string;
 }
 
-const PROVIDERS: Record<CloudProvider, ProviderMeta> = {
-  AWS: {
-    label: "AWS",
-    icon: "☁️",
-    accentGradient: "linear-gradient(135deg, #ff9900, #ffb84d)",
-  },
-  GCP: {
-    label: "GCP",
-    icon: "🔷",
-    accentGradient: "linear-gradient(135deg, #4285f4, #669df6)",
-  },
-  Azure: {
-    label: "Azure",
-    icon: "🔵",
-    accentGradient: "linear-gradient(135deg, #0078d4, #3399e0)",
-  },
-};
-
-const PROVIDER_KEYS: CloudProvider[] = ["AWS", "GCP", "Azure"];
-
-/* ── Component ────────────────────────────────────────────────────────── */
-
-const ProviderSelector: React.FC<ProviderSelectorProps> = ({
+export default function ProviderSelector({
   selected,
   onSelect,
   disabled = false,
-}) => {
+}: ProviderSelectorProps) {
+  const providers: ProviderOption[] = [
+    {
+      id: "AWS",
+      label: "AWS",
+      icon: <Cloud size={14} />,
+      activeColor: "#ff9900",
+    },
+    {
+      id: "GCP",
+      label: "GCP",
+      icon: <Layers size={14} />,
+      activeColor: "#4285f4",
+    },
+    {
+      id: "Azure",
+      label: "Azure",
+      icon: <Shield size={14} />,
+      activeColor: "#0078d4",
+    },
+  ];
+
   return (
-    <div>
-      {/* Label */}
-      <p
+    <div style={{ width: "100%" }}>
+      <label
         style={{
+          display: "block",
           fontSize: "0.75rem",
           fontWeight: 600,
           textTransform: "uppercase",
-          letterSpacing: "0.06em",
-          color: "var(--on-surface-variant)",
-          margin: "0 0 8px",
+          letterSpacing: "0.05em",
+          color: "#64748b",
+          marginBottom: "8px",
         }}
       >
-        Cloud Provider
-      </p>
+        Target Cloud Provider
+      </label>
 
-      {/* Segmented Control */}
       <div
         style={{
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
           gap: "8px",
         }}
       >
-        {PROVIDER_KEYS.map((key) => {
-          const meta = PROVIDERS[key];
-          const isSelected = key === selected;
-
+        {providers.map((p) => {
+          const isSelected = selected === p.id;
           return (
             <motion.button
-              key={key}
-              whileHover={!disabled ? { scale: 1.04 } : undefined}
-              whileTap={!disabled ? { scale: 0.97 } : undefined}
-              onClick={() => !disabled && onSelect(key)}
+              key={p.id}
+              whileTap={!disabled ? { scale: 0.96 } : undefined}
+              onClick={() => !disabled && onSelect(p.id)}
               disabled={disabled}
               className={`provider-pill ${isSelected ? "provider-pill--selected" : ""}`}
               style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
                 justifyContent: "center",
-                gap: "6px",
+                opacity: disabled ? 0.6 : 1,
+                cursor: disabled ? "not-allowed" : "pointer",
                 position: "relative",
-                opacity: disabled ? 0.5 : 1,
               }}
             >
-              {/* Animated selection indicator */}
+              <span style={{ color: isSelected ? p.activeColor : "#64748b" }}>
+                {p.icon}
+              </span>
+              <span>{p.label}</span>
+
+              {/* Active animated glow line */}
               {isSelected && (
                 <motion.div
                   layoutId="provider-indicator"
                   style={{
                     position: "absolute",
                     inset: 0,
-                    borderRadius: "999px",
-                    background: "rgba(255, 153, 0, 0.1)",
-                    border: "1px solid var(--primary-container)",
+                    borderRadius: "var(--radius-sm)",
+                    border: `1px solid ${p.activeColor}`,
+                    pointerEvents: "none",
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
                 />
               )}
-
-              <span style={{ position: "relative", zIndex: 1, fontSize: "0.875rem" }}>
-                {meta.icon}
-              </span>
-              <span style={{ position: "relative", zIndex: 1 }}>{meta.label}</span>
             </motion.button>
           );
         })}
       </div>
     </div>
   );
-};
-
-export default ProviderSelector;
+}

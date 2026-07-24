@@ -1,190 +1,165 @@
 "use client";
 
-import React, { useCallback, useRef } from "react";
+import React, { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, X, ShieldCheck } from "lucide-react";
-
-/* ── Types ────────────────────────────────────────────────────────────── */
+import { ShieldCheck, FileText, X, Plus } from "lucide-react";
 
 interface ComplianceUploaderProps {
-  /** Called with the selected compliance File (or null on clear). */
   onFileSelect: (file: File | null) => void;
-  /** Currently selected file (controlled). */
   selectedFile: File | null;
-  /** Disable interaction during analysis. */
   disabled?: boolean;
 }
 
-/* ── Component ────────────────────────────────────────────────────────── */
-
-const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
+export default function ComplianceUploader({
   onFileSelect,
   selectedFile,
   disabled = false,
-}) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+}: ComplianceUploaderProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) onFileSelect(file);
-    },
-    [onFileSelect]
-  );
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      onFileSelect(file);
+    }
+  };
 
-  const clearFile = useCallback(() => {
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onFileSelect(null);
-    if (inputRef.current) inputRef.current.value = "";
-  }, [onFileSelect]);
-
-  const formatSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <input
-        ref={inputRef}
         type="file"
-        accept=".pdf,.txt,application/pdf,text/plain"
-        onChange={handleChange}
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".pdf,.txt,.md"
         style={{ display: "none" }}
-        aria-label="Upload compliance document"
+        disabled={disabled}
       />
 
       <AnimatePresence mode="wait">
-        {!selectedFile ? (
-          /* ── Empty State ──────────────────────────────────────── */
-          <motion.button
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => !disabled && inputRef.current?.click()}
-            disabled={disabled}
-            style={{
-              width: "100%",
-              padding: "14px 16px",
-              borderRadius: "var(--radius-md)",
-              border: "1px dashed var(--outline-variant)",
-              background: "transparent",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              cursor: disabled ? "not-allowed" : "pointer",
-              opacity: disabled ? 0.5 : 1,
-              transition: "border-color 0.25s ease",
-              color: "var(--on-surface-variant)",
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled)
-                (e.currentTarget as HTMLButtonElement).style.borderColor =
-                  "var(--primary-container)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor =
-                "var(--outline-variant)";
-            }}
-          >
-            <ShieldCheck size={16} color="var(--on-surface-variant)" />
-            <span
-              style={{
-                fontSize: "0.8125rem",
-                fontWeight: 500,
-              }}
-            >
-              Attach compliance / security policy
-            </span>
-            <span
-              style={{
-                fontSize: "0.6875rem",
-                color: "var(--on-surface-variant)",
-                marginLeft: "auto",
-              }}
-            >
-              Optional · PDF / TXT
-            </span>
-          </motion.button>
-        ) : (
-          /* ── File Selected State ──────────────────────────────── */
+        {selectedFile ? (
+          /* ── Attached Compliance File ──────────────────────────────── */
           <motion.div
-            key="file"
+            key="file-attached"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2 }}
             style={{
-              width: "100%",
-              padding: "10px 14px",
-              borderRadius: "var(--radius-md)",
-              border: "1px solid rgba(34, 197, 94, 0.25)",
-              background: "rgba(34, 197, 94, 0.06)",
               display: "flex",
               alignItems: "center",
-              gap: "10px",
+              justifyContent: "space-between",
+              padding: "10px 14px",
+              borderRadius: "var(--radius-md)",
+              background: "rgba(16, 185, 129, 0.08)",
+              border: "1px solid rgba(16, 185, 129, 0.3)",
             }}
           >
-            <FileText size={16} color="#22c55e" />
-
-            <span
-              style={{
-                flex: 1,
-                fontSize: "0.8125rem",
-                fontWeight: 500,
-                color: "var(--on-surface)",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {selectedFile.name}
-            </span>
-
-            <span
-              style={{
-                fontSize: "0.75rem",
-                color: "var(--on-surface-variant)",
-                fontFamily: "var(--font-mono), monospace",
-                flexShrink: 0,
-              }}
-            >
-              {formatSize(selectedFile.size)}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <ShieldCheck size={18} color="#10b981" />
+              <div>
+                <p
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: 600,
+                    color: "#f8fafc",
+                    margin: 0,
+                    maxWidth: 200,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {selectedFile.name}
+                </p>
+                <p
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#10b981",
+                    margin: 0,
+                  }}
+                >
+                  Compliance Policy Loaded into Gemma Context
+                </p>
+              </div>
+            </div>
 
             {!disabled && (
               <motion.button
-                whileHover={{ scale: 1.15 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  clearFile();
-                }}
+                onClick={handleRemove}
                 style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: "50%",
-                  background: "rgba(186, 26, 26, 0.1)",
+                  background: "transparent",
                   border: "none",
+                  color: "#64748b",
+                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  cursor: "pointer",
-                  color: "var(--error)",
-                  flexShrink: 0,
+                  padding: 4,
                 }}
-                aria-label="Remove compliance document"
               >
-                <X size={12} />
+                <X size={14} />
               </motion.button>
             )}
+          </motion.div>
+        ) : (
+          /* ── Optional Upload Prompt ───────────────────────────────── */
+          <motion.div
+            key="upload-prompt"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => !disabled && fileInputRef.current?.click()}
+            whileHover={!disabled ? { borderColor: "rgba(99, 102, 241, 0.4)" } : undefined}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px 14px",
+              borderRadius: "var(--radius-md)",
+              background: "rgba(15, 23, 42, 0.4)",
+              border: "1px dashed rgba(255, 255, 255, 0.1)",
+              cursor: disabled ? "not-allowed" : "pointer",
+              opacity: disabled ? 0.6 : 1,
+              transition: "border-color 0.2s ease",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <ShieldCheck size={16} color="#64748b" />
+              <div>
+                <span
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: 500,
+                    color: "#cbd5e1",
+                  }}
+                >
+                  Attach Security Policy
+                </span>
+                <span
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#64748b",
+                    marginLeft: 6,
+                  }}
+                >
+                  (Optional · PDF / TXT)
+                </span>
+              </div>
+            </div>
+
+            <Plus size={16} color="#64748b" />
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-};
-
-export default ComplianceUploader;
+}

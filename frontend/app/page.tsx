@@ -1,250 +1,497 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Sparkles,
+  FileCode2,
+  MessageSquareWarning,
+  GitGraph,
+  ChevronRight,
+  StopCircle,
+} from "lucide-react";
 
-/* ── Console Scan Page (Home) ────────────────────────────────────────── */
-/* Matches Stitch Screen 1: Upload zone + Student Critique Lab + Recent Scans */
+import Navbar, { type ConnectionStatus } from "@/components/Navbar";
+import UploadDropzone from "@/components/UploadDropzone";
+import ComplianceUploader from "@/components/ComplianceUploader";
+import ProviderSelector, { type CloudProvider } from "@/components/ProviderSelector";
+import CritiqueViewer from "@/components/CritiqueViewer";
+import DiagramCanvas from "@/components/DiagramCanvas";
+import CodeExporter from "@/components/CodeExporter";
+import { useCloudCanvasStream } from "@/hooks/useCloudCanvasStream";
 
-export default function ConsoleScanPage() {
+/* ── Types ────────────────────────────────────────────────────────────── */
+
+type TabId = "critique" | "diagram" | "terraform";
+
+interface TabMeta {
+  id: TabId;
+  label: string;
+  icon: React.ReactNode;
+  hasData: boolean;
+}
+
+/* ── Page Component ───────────────────────────────────────────────────── */
+
+export default function WorkbenchPage() {
+  /* ── Local UI State ─────────────────────────────────────────────── */
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [complianceFile, setComplianceFile] = useState<File | null>(null);
+  const [provider, setProvider] = useState<CloudProvider>("AWS");
+  const [activeTab, setActiveTab] = useState<TabId>("critique");
+
+  /* ── Real-time Streaming Hook ───────────────────────────────────── */
+  const stream = useCloudCanvasStream();
+
+  /* ── Connection Status ────────────────────────────────────────── */
+  const connectionStatus: ConnectionStatus = stream.isStreaming
+    ? "processing"
+    : stream.error
+      ? "error"
+      : stream.isComplete
+        ? "active"
+        : "idle";
+
+  const hasResults =
+    stream.critiqueText !== null ||
+    stream.mermaidCode !== null ||
+    stream.terraformCode !== null;
+
+  /* ── Tab Configuration ────────────────────────────────────────── */
+  const tabs: TabMeta[] = [
+    {
+      id: "critique",
+      label: "Architectural Critique",
+      icon: <MessageSquareWarning size={15} />,
+      hasData: stream.critiqueText !== null,
+    },
+    {
+      id: "diagram",
+      label: "Interactive Diagram",
+      icon: <GitGraph size={15} />,
+      hasData: stream.mermaidCode !== null,
+    },
+    {
+      id: "terraform",
+      label: "Terraform Code",
+      icon: <FileCode2 size={15} />,
+      hasData: stream.terraformCode !== null,
+    },
+  ];
+
+  /* ── Handlers ───────────────────────────────────────────────────── */
+
+  const handleAnalyze = useCallback(async () => {
+    if (!imageFile) return;
+    await stream.startAnalysis(imageFile, complianceFile, provider);
+  }, [imageFile, complianceFile, provider, stream]);
+
+  const handleAbort = useCallback(() => {
+    stream.abort();
+  }, [stream]);
+
+  /* ── Tab Content Renderer ───────────────────────────────────────── */
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "critique":
+        return (
+          <CritiqueViewer
+            markdown={stream.critiqueText}
+            isLoading={stream.isStreaming && !stream.critiqueText}
+          />
+        );
+      case "diagram":
+        return (
+          <DiagramCanvas
+            mermaidCode={stream.mermaidCode}
+            isLoading={stream.isStreaming && !stream.mermaidCode}
+          />
+        );
+      case "terraform":
+        return (
+          <CodeExporter
+            code={stream.terraformCode}
+            isLoading={stream.isStreaming && !stream.terraformCode}
+          />
+        );
+    }
+  };
+
+  /* ── Main Render ───────────────────────────────────────────────── */
+
   return (
-    <div style={{ padding: "0 0 var(--footer-height)" }}>
-      {/* Breadcrumbs */}
-      <div
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#090d16" }}>
+      {/* Navbar with Gemma 4 Badge & Live Status */}
+      <Navbar status={connectionStatus} modelName="gemma-4-31b-it" />
+
+      {/* ── 2-Column Split Workbench Layout ─────────────────────────── */}
+      <main
         style={{
-          padding: "var(--space-sm) var(--space-lg)",
-          borderBottom: "1px solid var(--aws-border-color)",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          fontSize: "12px",
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "minmax(340px, 420px) 1fr",
+          gap: "20px",
+          padding: "20px",
+          maxWidth: "1680px",
+          width: "100%",
+          margin: "0 auto",
         }}
       >
-        <a href="#" style={{ color: "var(--secondary)", textDecoration: "none" }}>CloudCanvas</a>
-        <span className="material-symbols-outlined" style={{ fontSize: "14px", color: "var(--on-surface-variant)" }}>chevron_right</span>
-        <a href="#" style={{ color: "var(--secondary)", textDecoration: "none" }}>Scans</a>
-        <span className="material-symbols-outlined" style={{ fontSize: "14px", color: "var(--on-surface-variant)" }}>chevron_right</span>
-        <span style={{ color: "var(--on-surface)" }}>Initialize New Scan</span>
-      </div>
-
-      {/* Page Content */}
-      <div style={{ padding: "var(--space-lg)", maxWidth: "1280px", width: "100%", margin: "0 auto" }}>
-        {/* Page Header */}
-        <div style={{ marginBottom: "var(--space-xl)" }}>
-          <h1 style={{ fontSize: "24px", fontWeight: 600, lineHeight: "32px", letterSpacing: "-0.01em", margin: "0 0 4px" }}>
-            Initialize New Scan
-          </h1>
-          <p style={{ fontSize: "14px", color: "var(--on-surface-variant)", margin: 0 }}>
-            Convert your whiteboard diagrams into AWS CloudFormation templates in seconds.
-          </p>
-        </div>
-
-        {/* Grid Layout */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "var(--space-lg)" }}>
-          {/* Left Column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
-            {/* Upload Dropzone */}
-            <Link
-              href="/workbench"
-              style={{ textDecoration: "none", color: "inherit" }}
+        {/* ── LEFT PANEL: Workspace Input ─────────────────────────── */}
+        <motion.aside
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="glass-panel"
+          style={{
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            height: "fit-content",
+            position: "sticky",
+            top: "84px",
+          }}
+        >
+          {/* Header */}
+          <div>
+            <h2
+              style={{
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "#f8fafc",
+                margin: "0 0 4px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
             >
-              <div
-                className="card"
+              Workspace Input
+            </h2>
+            <p
+              style={{
+                fontSize: "0.8125rem",
+                color: "#64748b",
+                margin: 0,
+              }}
+            >
+              Upload architecture sketch & security guidelines
+            </p>
+          </div>
+
+          <div style={{ height: 1, background: "rgba(255, 255, 255, 0.08)" }} />
+
+          {/* 1. Drag & Drop Sketch Upload Zone */}
+          <UploadDropzone
+            onFileSelect={setImageFile}
+            selectedFile={imageFile}
+            disabled={stream.isStreaming}
+          />
+
+          {/* 2. Optional Compliance / Security Policy Uploader */}
+          <ComplianceUploader
+            onFileSelect={setComplianceFile}
+            selectedFile={complianceFile}
+            disabled={stream.isStreaming}
+          />
+
+          {/* 3. Cloud Provider Segmented Pill Control */}
+          <ProviderSelector
+            selected={provider}
+            onSelect={setProvider}
+            disabled={stream.isStreaming}
+          />
+
+          <div style={{ height: 1, background: "rgba(255, 255, 255, 0.08)" }} />
+
+          {/* 4. Trigger / Abort Button */}
+          {stream.isStreaming ? (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleAbort}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                width: "100%",
+                padding: "14px 28px",
+                borderRadius: "var(--radius-md)",
+                fontSize: "0.9375rem",
+                fontWeight: 700,
+                color: "#ffffff",
+                background: "linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)",
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 0 20px rgba(244, 63, 94, 0.4)",
+              }}
+            >
+              <StopCircle size={18} />
+              Stop Analysis
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={imageFile ? { scale: 1.02 } : undefined}
+              whileTap={imageFile ? { scale: 0.98 } : undefined}
+              className="btn-analyze"
+              disabled={!imageFile}
+              onClick={handleAnalyze}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                width: "100%",
+              }}
+            >
+              <Sparkles size={18} />
+              Analyze System Design
+              <ChevronRight size={16} style={{ opacity: 0.7 }} />
+            </motion.button>
+          )}
+
+          {/* Error Banner */}
+          <AnimatePresence>
+            {stream.error && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
                 style={{
-                  padding: "var(--space-xl) var(--space-lg)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minHeight: "400px",
-                  borderStyle: "dashed",
-                  borderWidth: "2px",
-                  borderColor: "var(--outline-variant)",
-                  cursor: "pointer",
-                  transition: "border-color 0.2s ease",
+                  padding: "12px 14px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid rgba(244, 63, 94, 0.4)",
+                  background: "rgba(244, 63, 94, 0.1)",
+                  fontSize: "0.8125rem",
+                  color: "#f43f5e",
+                  lineHeight: 1.5,
                 }}
               >
-                <div
+                {stream.error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Active Model Context */}
+          <AnimatePresence>
+            {stream.activeModel && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "0.75rem",
+                  color: "#64748b",
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                <span className="status-dot status-dot--active" />
+                {stream.activeModel} · {stream.activeProvider}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.aside>
+
+        {/* ── RIGHT PANEL: Live Intelligence Dashboard ────────────── */}
+        <motion.section
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="glass-panel"
+          style={{
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "calc(100vh - 120px)",
+            overflow: "hidden",
+          }}
+        >
+          {/* Tab Navigation Bar */}
+          <div
+            style={{
+              display: "flex",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+              padding: "0 12px",
+              background: "rgba(15, 23, 42, 0.5)",
+            }}
+          >
+            {tabs.map((tab) => {
+              const isActive = tab.id === activeTab;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
                   style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    background: "var(--surface-container-low)",
+                    position: "relative",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: "var(--space-md)",
+                    gap: "8px",
+                    padding: "16px 20px",
+                    fontSize: "0.875rem",
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? "#818cf8" : "#64748b",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "color 0.2s ease",
                   }}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: "48px", color: "var(--primary)" }}>
-                    add_a_photo
-                  </span>
-                </div>
-                <h3 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
-                  Drop Whiteboard Photo
-                </h3>
-                <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", textAlign: "center", maxWidth: "360px", marginBottom: "var(--space-lg)" }}>
-                  Support for JPG, PNG, and HEIC. Ensure lighting is clear and all component icons are visible.
-                </p>
-                <div style={{ display: "flex", gap: "var(--space-md)" }}>
-                  <span className="btn-primary">
-                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>upload_file</span>
-                    Choose Files
-                  </span>
-                  <span className="btn-secondary">
-                    Take Photo
-                  </span>
-                </div>
-              </div>
-            </Link>
+                  {tab.icon}
+                  {tab.label}
 
-            {/* Student Critique Lab */}
-            <section
-              style={{
-                background: "var(--surface-container-low)",
-                border: "1px solid var(--aws-border-color)",
-                borderRadius: "var(--radius-lg)",
-                padding: "var(--space-lg)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-md)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
-                  <span className="material-symbols-outlined" style={{ color: "var(--tertiary)" }}>school</span>
-                  <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>Student Critique Lab</h2>
-                </div>
-                <span className="tag tag--info" style={{ fontSize: "10px" }}>Learning Mode</span>
-              </div>
+                  {/* Data indicator dot */}
+                  {tab.hasData && (
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "#10b981",
+                        boxShadow: "0 0 10px rgba(16, 185, 129, 0.6)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
 
-              <p style={{ fontSize: "12px", color: "var(--on-surface-variant)", marginBottom: "var(--space-lg)" }}>
-                Practice identifying misconfigurations in provided whiteboard scenarios. Earn cloud architect credits.
-              </p>
+                  {/* Active sliding indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-tab-glow"
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 2,
+                        background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
+                        borderRadius: "2px 2px 0 0",
+                        boxShadow: "0 0 12px rgba(99, 102, 241, 0.8)",
+                      }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-md)" }}>
-                {/* Scenario 1 */}
-                <div className="card" style={{ padding: "var(--space-sm)", cursor: "pointer" }}>
-                  <div
-                    style={{
-                      height: "128px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--surface-container-high)",
-                      marginBottom: "var(--space-sm)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: "48px", color: "var(--outline)" }}>draw</span>
-                  </div>
-                  <h4 style={{ fontSize: "14px", fontWeight: 600, margin: "0 0 4px" }}>Scenario: The Single-Region Trap</h4>
-                  <p style={{ fontSize: "11px", color: "var(--on-surface-variant)", margin: 0 }}>Identify 3 critical availability flaws.</p>
-                </div>
-
-                {/* Scenario 2 */}
-                <div className="card" style={{ padding: "var(--space-sm)", cursor: "pointer" }}>
-                  <div
-                    style={{
-                      height: "128px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--surface-container-high)",
-                      marginBottom: "var(--space-sm)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: "48px", color: "var(--outline)" }}>security</span>
-                  </div>
-                  <h4 style={{ fontSize: "14px", fontWeight: 600, margin: "0 0 4px" }}>Scenario: Over-Privileged Lambda</h4>
-                  <p style={{ fontSize: "11px", color: "var(--on-surface-variant)", margin: 0 }}>Find the security group overlap.</p>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* Right Column: Recent Scans */}
-          <div className="card" style={{ height: "fit-content", overflow: "hidden" }}>
-            <div
-              style={{
-                background: "var(--surface-container)",
-                padding: "var(--space-sm) var(--space-md)",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <h3 style={{ fontSize: "16px", fontWeight: 600, margin: 0 }}>Recent Scans</h3>
-              <button style={{ color: "var(--secondary)", fontSize: "11px", fontWeight: 700, background: "none", border: "none", cursor: "pointer" }}>
-                View All
-              </button>
-            </div>
-
-            {/* Scan Items */}
-            {[
-              { name: "E-Commerce Backend", tags: ["VPC", "RDS"], status: "Terraform Ready", statusIcon: "check_circle", statusColor: "#22c55e", time: "2h ago" },
-              { name: "Serverless Pipeline", tags: ["Lambda"], status: "Manual Review Required", statusIcon: "pending", statusColor: "#f59e0b", time: "Yesterday" },
-              { name: "Transit Hub V2", tags: ["Direct Connect"], status: "OCR Failed (Low Light)", statusIcon: "error", statusColor: "var(--error)", time: "3 days ago" },
-            ].map((scan, i) => (
+            {/* Component Count Badge */}
+            {stream.detectedComponents.length > 0 && (
               <div
-                key={i}
                 style={{
-                  padding: "var(--space-md)",
-                  borderTop: i > 0 ? "1px solid var(--outline-variant)" : undefined,
-                  cursor: "pointer",
-                  transition: "background 0.15s",
+                  display: "flex",
+                  alignItems: "center",
+                  marginLeft: "auto",
+                  paddingRight: "16px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "start", gap: "var(--space-md)" }}>
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#818cf8",
+                    fontFamily: "var(--font-mono)",
+                    padding: "3px 10px",
+                    borderRadius: "12px",
+                    background: "rgba(99, 102, 241, 0.12)",
+                    border: "1px solid rgba(99, 102, 241, 0.25)",
+                  }}
+                >
+                  {stream.detectedComponents.length} components detected
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Tab Content Display */}
+          <div style={{ flex: 1, overflow: "auto" }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  height: "100%",
+                  ...(activeTab !== "diagram" ? { padding: "24px" } : {}),
+                }}
+              >
+                {!hasResults && !stream.isStreaming ? (
+                  /* Empty State Prompt */
                   <div
                     style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--surface-container-high)",
-                      flexShrink: 0,
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
+                      padding: "100px 24px",
+                      textAlign: "center",
+                      gap: "16px",
                     }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: "24px", color: "var(--outline)" }}>
-                      description
-                    </span>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                      <h4 style={{ fontSize: "13px", fontWeight: 700, margin: 0 }}>{scan.name}</h4>
-                      <span style={{ fontSize: "10px", color: "var(--on-surface-variant)" }}>{scan.time}</span>
+                    <div
+                      style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: "var(--radius-lg)",
+                        background: "rgba(99, 102, 241, 0.1)",
+                        border: "1px solid rgba(99, 102, 241, 0.2)",
+                        boxShadow: "0 0 30px rgba(99, 102, 241, 0.15)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Sparkles size={28} color="#818cf8" />
                     </div>
-                    <div style={{ display: "flex", gap: "4px", marginTop: "4px" }}>
-                      {scan.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          style={{
-                            fontSize: "9px",
-                            fontWeight: 700,
-                            background: "var(--on-secondary-container)",
-                            color: "white",
-                            padding: "1px 6px",
-                            borderRadius: "var(--radius-md)",
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: "11px", color: "var(--on-surface-variant)", margin: "8px 0 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: "12px", color: scan.statusColor }}>
-                        {scan.statusIcon}
-                      </span>
-                      {scan.status}
+                    <h3
+                      style={{
+                        fontSize: "1.125rem",
+                        fontWeight: 600,
+                        color: "#f8fafc",
+                        margin: 0,
+                      }}
+                    >
+                      Live Intelligence Dashboard
+                    </h3>
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "#64748b",
+                        margin: 0,
+                        maxWidth: 400,
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      Upload an architecture sketch and click{" "}
+                      <strong style={{ color: "#818cf8" }}>Analyze System Design</strong>{" "}
+                      to watch Gemma 4 produce real-time critiques, Mermaid diagrams, and Terraform code.
                     </p>
                   </div>
-                </div>
-              </div>
-            ))}
+                ) : (
+                  renderTabContent()
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
-        </div>
-      </div>
+        </motion.section>
+      </main>
+
+      {/* Responsive Breakpoint Override */}
+      <style>{`
+        @media (max-width: 960px) {
+          main {
+            grid-template-columns: 1fr !important;
+          }
+          aside {
+            position: static !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
