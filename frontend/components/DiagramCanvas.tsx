@@ -30,24 +30,24 @@ function initMermaid() {
   if (mermaidInitialized) return;
   mermaid.initialize({
     startOnLoad: false,
-    theme: "dark",
+    theme: "neutral",
     themeVariables: {
-      darkMode: true,
-      background: "#0f1424",
-      primaryColor: "#6366f1",
-      primaryBorderColor: "#818cf8",
-      primaryTextColor: "#f1f5f9",
-      secondaryColor: "#1a2138",
-      secondaryBorderColor: "#4b5563",
-      secondaryTextColor: "#94a3b8",
-      tertiaryColor: "#151b2e",
-      lineColor: "#6366f1",
-      fontFamily: "var(--font-inter), Inter, system-ui, sans-serif",
+      darkMode: false,
+      background: "#ffffff",
+      primaryColor: "#ff9900",
+      primaryBorderColor: "#8a5100",
+      primaryTextColor: "#231a11",
+      secondaryColor: "#fff1e7",
+      secondaryBorderColor: "#dbc2ad",
+      secondaryTextColor: "#554434",
+      tertiaryColor: "#f7e5d7",
+      lineColor: "#0062a0",
+      fontFamily: "'Work Sans', system-ui, sans-serif",
       fontSize: "14px",
-      nodeBorder: "#818cf8",
-      clusterBkg: "rgba(99, 102, 241, 0.08)",
-      clusterBorder: "rgba(99, 102, 241, 0.25)",
-      edgeLabelBackground: "#0f1424",
+      nodeBorder: "#8a5100",
+      clusterBkg: "rgba(255, 153, 0, 0.06)",
+      clusterBorder: "rgba(255, 153, 0, 0.25)",
+      edgeLabelBackground: "#ffffff",
     },
     flowchart: {
       htmlLabels: true,
@@ -85,8 +85,8 @@ const DiagramSkeleton: React.FC = () => (
                 width: row === 2 ? 90 : 120,
                 height: 40,
                 borderRadius: "var(--radius-sm)",
-                border: "1px solid var(--glass-border)",
-                background: "var(--bg-tertiary)",
+                border: "1px solid var(--outline-variant)",
+                background: "var(--surface-container-low)",
               }}
             />
           ))}
@@ -97,14 +97,14 @@ const DiagramSkeleton: React.FC = () => (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       <Loader2
         size={16}
-        color="var(--accent-indigo-light)"
+        color="var(--primary)"
         style={{ animation: "spin 1s linear infinite" }}
       />
       <span
         style={{
           fontSize: "0.8125rem",
-          color: "var(--text-muted)",
-          fontFamily: "var(--font-mono), monospace",
+          color: "var(--on-surface-variant)",
+          fontFamily: "'JetBrains Mono', monospace",
         }}
       >
         Parsing diagram tokens…
@@ -273,16 +273,16 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
             width: 48,
             height: 48,
             borderRadius: "var(--radius-md)",
-            background: "rgba(99, 102, 241, 0.08)",
-            border: "1px solid var(--glass-border)",
+            background: "rgba(0, 98, 160, 0.06)",
+            border: "1px solid var(--outline-variant)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Maximize2 size={20} color="var(--text-muted)" />
+          <Maximize2 size={20} color="var(--on-surface-variant)" />
         </div>
-        <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", margin: 0 }}>
+        <p style={{ fontSize: "0.875rem", color: "var(--on-surface-variant)", margin: 0 }}>
           Architecture diagram will appear here after analysis.
         </p>
       </div>
@@ -306,7 +306,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
           alignItems: "center",
           gap: "4px",
           padding: "8px 12px",
-          borderBottom: "1px solid var(--glass-border)",
+          borderBottom: "1px solid var(--outline-variant)",
         }}
       >
         {[
@@ -332,21 +332,21 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
               gap: "5px",
               padding: "6px 10px",
               borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--glass-border)",
+              border: "1px solid var(--outline-variant)",
               background: "transparent",
-              color: "var(--text-secondary)",
+              color: "var(--on-surface-variant)",
               fontSize: "0.6875rem",
               fontWeight: 500,
               cursor: "pointer",
               transition: "background 0.2s, border-color 0.2s",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "var(--bg-tertiary)";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--glass-hover)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-container-low)";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--outline)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--glass-border)";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--outline-variant)";
             }}
           >
             {btn.icon}
@@ -359,8 +359,8 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
           style={{
             marginLeft: "auto",
             fontSize: "0.6875rem",
-            color: "var(--text-muted)",
-            fontFamily: "var(--font-mono), monospace",
+            color: "var(--on-surface-variant)",
+            fontFamily: "'JetBrains Mono', monospace",
           }}
         >
           {Math.round(scale * 100)}%
@@ -373,8 +373,8 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
           flex: 1,
           overflow: "hidden",
           cursor: isPanning.current ? "grabbing" : "grab",
-          background: "var(--bg-secondary)",
-          borderRadius: "0 0 var(--radius-sm) var(--radius-sm)",
+          background: "var(--surface-container-low)",
+          borderRadius: "0 0 var(--radius-md) var(--radius-md)",
           position: "relative",
         }}
         onMouseDown={handleMouseDown}
@@ -400,10 +400,10 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
               style={{
                 padding: "12px 16px",
                 borderRadius: "var(--radius-sm)",
-                background: "rgba(251, 113, 133, 0.08)",
-                border: "1px solid rgba(251, 113, 133, 0.25)",
+                background: "rgba(186, 26, 26, 0.06)",
+                border: "1px solid rgba(186, 26, 26, 0.2)",
                 fontSize: "0.8125rem",
-                color: "var(--accent-rose)",
+                color: "var(--error)",
                 maxWidth: 400,
                 lineHeight: 1.6,
               }}

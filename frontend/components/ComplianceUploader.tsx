@@ -69,7 +69,7 @@ const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
               width: "100%",
               padding: "14px 16px",
               borderRadius: "var(--radius-md)",
-              border: "1px dashed var(--glass-border)",
+              border: "1px dashed var(--outline-variant)",
               background: "transparent",
               display: "flex",
               alignItems: "center",
@@ -77,19 +77,19 @@ const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
               cursor: disabled ? "not-allowed" : "pointer",
               opacity: disabled ? 0.5 : 1,
               transition: "border-color 0.25s ease",
-              color: "var(--text-secondary)",
+              color: "var(--on-surface-variant)",
             }}
             onMouseEnter={(e) => {
               if (!disabled)
                 (e.currentTarget as HTMLButtonElement).style.borderColor =
-                  "var(--accent-indigo)";
+                  "var(--primary-container)";
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.borderColor =
-                "var(--glass-border)";
+                "var(--outline-variant)";
             }}
           >
-            <ShieldCheck size={16} color="var(--text-muted)" />
+            <ShieldCheck size={16} color="var(--on-surface-variant)" />
             <span
               style={{
                 fontSize: "0.8125rem",
@@ -101,7 +101,7 @@ const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
             <span
               style={{
                 fontSize: "0.6875rem",
-                color: "var(--text-muted)",
+                color: "var(--on-surface-variant)",
                 marginLeft: "auto",
               }}
             >
@@ -120,21 +120,21 @@ const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
               width: "100%",
               padding: "10px 14px",
               borderRadius: "var(--radius-md)",
-              border: "1px solid rgba(52, 211, 153, 0.25)",
-              background: "rgba(52, 211, 153, 0.06)",
+              border: "1px solid rgba(34, 197, 94, 0.25)",
+              background: "rgba(34, 197, 94, 0.06)",
               display: "flex",
               alignItems: "center",
               gap: "10px",
             }}
           >
-            <FileText size={16} color="var(--accent-emerald)" />
+            <FileText size={16} color="#22c55e" />
 
             <span
               style={{
                 flex: 1,
                 fontSize: "0.8125rem",
                 fontWeight: 500,
-                color: "var(--text-primary)",
+                color: "var(--on-surface)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -146,7 +146,7 @@ const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
             <span
               style={{
                 fontSize: "0.75rem",
-                color: "var(--text-muted)",
+                color: "var(--on-surface-variant)",
                 fontFamily: "var(--font-mono), monospace",
                 flexShrink: 0,
               }}
@@ -166,13 +166,13 @@ const ComplianceUploader: React.FC<ComplianceUploaderProps> = ({
                   width: 22,
                   height: 22,
                   borderRadius: "50%",
-                  background: "rgba(251, 113, 133, 0.15)",
+                  background: "rgba(186, 26, 26, 0.1)",
                   border: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
-                  color: "var(--accent-rose)",
+                  color: "var(--error)",
                   flexShrink: 0,
                 }}
                 aria-label="Remove compliance document"

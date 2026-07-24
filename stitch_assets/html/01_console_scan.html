@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CloudCanvas - Initialize New Scan</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Work Sans for Corporate/Modern feel & JetBrains Mono for Code -->
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Design System Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "background": "#fff8f5",
+                    "surface-tint": "#8a5100",
+                    "surface-dim": "#e9d7c9",
+                    "on-tertiary-fixed": "#001e2c",
+                    "inverse-on-surface": "#ffeee0",
+                    "on-secondary-fixed-variant": "#00497a",
+                    "outline": "#887361",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#f1dfd1",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#04beff",
+                    "surface-container": "#fdebdc",
+                    "on-secondary-container": "#004472",
+                    "tertiary-fixed-dim": "#7cd0ff",
+                    "surface-container-highest": "#f1dfd1",
+                    "on-background": "#231a11",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fff8f5",
+                    "tertiary": "#00668a",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#9ccaff",
+                    "surface": "#fff8f5",
+                    "on-surface-variant": "#554434",
+                    "inverse-primary": "#ffb86f",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#231a11",
+                    "on-primary-fixed-variant": "#693c00",
+                    "tertiary-fixed": "#c4e7ff",
+                    "outline-variant": "#dbc2ad",
+                    "secondary": "#0062a0",
+                    "surface-container-high": "#f7e5d7",
+                    "on-tertiary-fixed-variant": "#004c69",
+                    "surface-container-low": "#fff1e7",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#d0e4ff",
+                    "on-primary-fixed": "#2c1600",
+                    "on-tertiary-container": "#004965",
+                    "on-secondary-fixed": "#001d35",
+                    "inverse-surface": "#392e25",
+                    "primary-fixed": "#ffdcbd",
+                    "secondary-container": "#64b3ff",
+                    "on-primary-container": "#653a00",
+                    "primary": "#8a5100",
+                    "primary-fixed-dim": "#ffb86f",
+                    "primary-container": "#ff9900"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "24px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "margin-mobile": "16px",
+                    "xl": "32px",
+                    "gutter": "20px"
+            },
+            "fontFamily": {
+                    "body-md": ["Work Sans"],
+                    "headline-md": ["Work Sans"],
+                    "label-sm": ["Work Sans"],
+                    "body-lg": ["Work Sans"],
+                    "display-header": ["Work Sans"],
+                    "headline-sm": ["Work Sans"],
+                    "code": ["jetbrainsMono"]
+            },
+            "fontSize": {
+                    "body-md": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "body-lg": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-header": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["16px", {"lineHeight": "22px", "fontWeight": "600"}],
+                    "code": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #ffffff;
+            color: #231a11;
+        }
+        .aws-border {
+            border: 1px solid #eaeded;
+        }
+        .aws-header {
+            background-color: #232f3e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for data-heavy areas */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f2f3f3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #887361;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-inverse-surface fixed top-0 z-50 w-full h-[48px] flex justify-between items-center px-md text-primary-fixed">
+<div class="flex items-center gap-md">
+<span class="font-display-header text-display-header text-on-primary-fixed-variant tracking-tight">CloudCanvas</span>
+<div class="hidden md:flex gap-md ml-lg">
+<a class="text-surface-container-low font-body-md text-body-md hover:bg-on-surface-variant/20 hover:text-white transition-colors px-2 py-1 rounded" href="#">Services</a>
+<a class="text-surface-container-low font-body-md text-body-md hover:bg-on-surface-variant/20 hover:text-white transition-colors px-2 py-1 rounded" href="#">Projects</a>
+</div>
+</div>
+<div class="flex-1 max-w-xl mx-xl hidden md:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-surface-variant text-[18px]">search</span>
+<input class="w-full bg-white border-none rounded-lg py-1.5 pl-10 text-body-md text-on-surface focus:ring-2 focus:ring-primary-container outline-none" placeholder="Search for architectures, scans, or documentation" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-surface-container-low hover:text-white transition-colors cursor-pointer">notifications</button>
+<button class="material-symbols-outlined text-surface-container-low hover:text-white transition-colors cursor-pointer">help</button>
+<button class="material-symbols-outlined text-surface-container-low hover:text-white transition-colors cursor-pointer">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-surface-variant cursor-pointer active:opacity-80 transition-all">
+<img class="w-full h-full object-cover" data-alt="Professional corporate headshot of a cloud architect, soft studio lighting, high resolution, minimalist aesthetic, neutral background, sharp focus, 8k quality, authoritative yet approachable look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPjNGkb_bEr13uBc06GCJnM72kRCtT1iKL_CVLtKe4vxNyC4QZDcGeO2ekqiJ9LOWikDBl0CNAEXS4uhhoRxnUC-rKP2c_TJyhuQXUXUZ1X9HErhwuQBGpsY5mudWDKKqKWx5A9Qvlr5Pnl3hkyrPp0DPl9E0SX0_apeo20BrPLR_yRkK6pT_aiKWlhI4EDrzIcEVO6SsjyM8Ew3ckYiQXYbrWBFf_8TQmKnpi8ZI3681lXl03zeLf_vGFo2WQShzdiDucufi7bPVG"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 h-full w-[240px] pt-[48px] bg-surface-dim border-r border-outline-variant flex flex-col gap-xs p-sm z-40 hidden md:flex">
+<div class="px-sm py-md">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Navigation</h2>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Cloud Architecture Assistant</p>
+</div>
+<nav class="flex flex-col gap-1">
+<div class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all cursor-pointer select-none">
+<span class="material-symbols-outlined">architecture</span>
+                My Architectures
+            </div>
+<div class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all cursor-pointer select-none">
+<span class="material-symbols-outlined">database</span>
+                Knowledge Base
+            </div>
+<!-- Active State for Recent Scans -->
+<div class="font-bold text-on-surface bg-surface-container-high border-l-2 border-primary-container flex items-center gap-sm px-sm py-2 cursor-pointer select-none">
+<span class="material-symbols-outlined">history</span>
+                Recent Scans
+            </div>
+<div class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all cursor-pointer select-none">
+<span class="material-symbols-outlined">grade</span>
+                Upgrade to Pro
+            </div>
+</nav>
+<div class="mt-auto pb-lg px-sm">
+<button class="w-full bg-primary-container text-on-primary-container font-headline-sm py-2 rounded-lg hover:brightness-110 active:opacity-80 transition-all flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">add</span>
+                Create New Design
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-[240px] pt-[48px] min-h-screen flex flex-col">
+<!-- Breadcrumbs -->
+<div class="px-lg py-sm aws-border border-l-0 border-r-0 flex items-center gap-2 text-secondary font-body-md">
+<a class="hover:underline" href="#">CloudCanvas</a>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">chevron_right</span>
+<a class="hover:underline" href="#">Scans</a>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">chevron_right</span>
+<span class="text-on-surface">Initialize New Scan</span>
+</div>
+<div class="flex-1 px-lg py-lg max-w-[1280px] w-full mx-auto">
+<!-- Page Header -->
+<div class="mb-xl">
+<h1 class="font-display-header text-display-header text-on-surface mb-1">Initialize New Scan</h1>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Convert your whiteboard diagrams into AWS CloudFormation templates in seconds.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Main Upload Area -->
+<div class="lg:col-span-2 flex flex-col gap-lg">
+<div class="aws-border bg-white p-xl rounded-lg flex flex-col items-center justify-center min-h-[400px] border-dashed border-2 border-outline-variant hover:border-primary-container transition-all group cursor-pointer">
+<div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[48px] text-primary">add_a_photo</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-2">Drop Whiteboard Photo</h3>
+<p class="text-on-surface-variant mb-lg text-center max-w-sm">Support for JPG, PNG, and HEIC. Ensure lighting is clear and all component icons are visible.</p>
+<div class="flex gap-md">
+<button class="bg-primary-container text-on-primary-container px-lg py-2 rounded-lg font-headline-sm hover:brightness-110 transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined">upload_file</span>
+                                Choose Files
+                            </button>
+<button class="bg-white aws-border text-secondary px-lg py-2 rounded-lg font-headline-sm hover:bg-surface-container-low transition-all">
+                                Take Photo
+                            </button>
+</div>
+</div>
+<!-- Student Critique Lab -->
+<section class="aws-border bg-surface-container-low p-lg rounded-lg">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary">school</span>
+<h2 class="font-headline-md text-headline-md">Student Critique Lab</h2>
+</div>
+<span class="bg-tertiary-container text-on-tertiary-container text-[10px] uppercase font-bold px-2 py-0.5 rounded">Learning Mode</span>
+</div>
+<p class="text-on-surface-variant mb-lg font-body-md">Practice identifying misconfigurations in provided whiteboard scenarios. Earn cloud architect credits.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="aws-border bg-white p-sm rounded-lg hover:shadow-sm transition-shadow cursor-pointer">
+<div class="h-32 w-full bg-surface-variant rounded mb-sm overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="High-contrast photograph of a physical whiteboard showing a poorly designed web architecture. Sketchy boxes represent EC2 instances and databases without security groups. Bright fluorescent office lighting reflects off the white surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB53kck-X2o0UIIg3grqAgu9cuXs4yFCRQv29qdndmrSwvM98gKS6lfz5mg68ovPMca3M4FL8q5kFldnhg3F6h6nypp3ZQuXX_0RIYAoixSDHsCnAzo3s2lzQeIK-vq5vvly0i54KWoHGhviS99EIzRgaTX44GM0sb474tDbXNGouGiZlONPEkOrdeJyO7vfcSzSOUMMP4GnkjYuBs8ryqAaX_I4JqsMErNpCQ430-VdAJgJ_LrZuYLh735tE4C9_xE1OgVbLshJkY5"/>
+</div>
+<h4 class="font-headline-sm text-[14px]">Scenario: The Single-Region Trap</h4>
+<p class="text-on-surface-variant text-[11px] mt-1">Identify 3 critical availability flaws.</p>
+</div>
+<div class="aws-border bg-white p-sm rounded-lg hover:shadow-sm transition-shadow cursor-pointer">
+<div class="h-32 w-full bg-surface-variant rounded mb-sm overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean whiteboard diagram drawn with blue and black markers. It depicts a serverless application with Lambda and API Gateway, but with obvious missing IAM role connections. Professional lighting, crisp focus on the handwriting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSn6baEmDYxH6RzNbOt89UFmQDInxX9yWNFOGwmDFemGReRdA54Xmttfzu-G9EgU_CpI_e0gg-LZlea40c1B-cvDkQIclUtu_td7usD10zoPQNkth0gpjjHba4YycGhnpoJq1Q6cFSWBoZDmUKFE0CH42VWCNOAcJoZQ2h90WfBkd8v5CGpPsaKAW0Sc6NwDE5Sv9fgYE1XF-N2uhUTNoCFY0kJEIHhjBlZ9szJnKrHJPEVpQW5etpGDvzyVlCCpyzgcOolorSqrU_"/>
+</div>
+<h4 class="font-headline-sm text-[14px]">Scenario: Over-Privileged Lambda</h4>
+<p class="text-on-surface-variant text-[11px] mt-1">Find the security group overlap.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Recent Scans Sidebar -->
+<div class="flex flex-col gap-md">
+<div class="aws-border bg-white rounded-lg flex flex-col h-full overflow-hidden">
+<div class="bg-surface-container px-md py-sm flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm">Recent Scans</h3>
+<button class="text-secondary font-label-sm text-label-sm hover:underline">View All</button>
+</div>
+<div class="flex flex-col divide-y divide-outline-variant overflow-y-auto max-h-[700px]">
+<!-- Scan Item 1 -->
+<div class="p-md hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 bg-surface-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Thumbnail of a whiteboard diagram showing a VPC with multiple subnets. The drawing is neat with standard AWS icons sketched in green and blue ink. Clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDydJnIx0vS3-WFTcEIZDNw8v_wEtgPp_GEdp6nwB9DfygXoWtw0VhRWp9iItIqX0yUYjcVRI3n0v3x2xTsYgjmEUOhze_Y6_QvJNCNOobINUxNhk5WoRGERAE6hI4UtpGOBgOeXkXdYP9qPM54MRgXd71R2JYUjSC16Dh9QUh78HaHkce6ilfZtBPvc4As84z0jKjxfatHE0ljIXzXJBWV-WkjGthUYhyHOHpTOHscMFwQEVGBSCiVesJZ5safRjY8ifAP6m_SU_jx"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface text-[13px]">E-Commerce Backend</h4>
+<span class="text-[10px] text-on-surface-variant">2h ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-on-secondary-container text-white text-[9px] px-1.5 py-0.5 rounded">VPC</span>
+<span class="bg-on-secondary-container text-white text-[9px] px-1.5 py-0.5 rounded">RDS</span>
+</div>
+<p class="text-on-surface-variant text-[11px] mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-success">check_circle</span>
+                                            Terraform Ready
+                                        </p>
+</div>
+</div>
+</div>
+<!-- Scan Item 2 -->
+<div class="p-md hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 bg-surface-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A macro shot of a hand-drawn diagram on a napkin converted to a digital format. It shows a serverless architecture with DynamoDB and S3 icons. Warm ambient lighting, sharp digital conversion." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCTOUPVhOldkYk7-_rZGSscJUzRVDW1oGzEbNEUQmXtE0A_-ep58zd0qvYcC8ivvz8sJ28HB3aN97a85fxKXpKusd8WIDYFn8nvWSG5nW2giy7_lr2KIGmLINti4j541zt_qXYRDs4nUfLWUBCZ9JB-UhFU4Pg_N8oEj8WTgUJ6lsMir3dhzEl42p_zL1-oC6In3buTWu7PADiJed40QH6EpMI5WoMAERUWAsNkK9UkNuXqBoqRpfALZaFlRA_twfsYVaz0htpkiuL"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface text-[13px]">Serverless Pipeline</h4>
+<span class="text-[10px] text-on-surface-variant">Yesterday</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-on-secondary-container text-white text-[9px] px-1.5 py-0.5 rounded">Lambda</span>
+</div>
+<p class="text-on-surface-variant text-[11px] mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-warning">pending</span>
+                                            Manual Review Required
+                                        </p>
+</div>
+</div>
+</div>
+<!-- Scan Item 3 -->
+<div class="p-md hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 bg-surface-variant rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A detailed complex network diagram sketched on a glass wall. Reflection of city lights in the background. The scan captures complex hub-and-spoke connectivity with Transit Gateway." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsqDmRLXFlpSpYst7x-B1ioY_2gmUocDYrLz1jp_gAt9eev89GD91MneXWOJB_KC97oxaCBcbmQaIaZQOBg9Jfl8oPjWRA2YZ-2Z0Tp52JSEk8Nviejb42Ln7u3sfdmS2im9ZBIcD1Ne1kdSj76C2JP37W4aaY7nyC2VWDi4rvmhgAeAX1D8qc_B-rDTVtoQ-dki3YQSSnXvRQGHCF12fFa5HGPo-CXa523a_vBopiq-lblQLj648eEbAIyKhNRolbBXm8YSiPCaFx"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface text-[13px]">Transit Hub V2</h4>
+<span class="text-[10px] text-on-surface-variant">3 days ago</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="bg-on-secondary-container text-white text-[9px] px-1.5 py-0.5 rounded">Direct Connect</span>
+</div>
+<p class="text-on-surface-variant text-[11px] mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-error">error</span>
+                                            OCR Failed (Low Light)
+                                        </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto bg-surface-container-highest border-t border-outline-variant w-full py-sm flex flex-col md:flex-row justify-center items-center gap-lg px-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant">© 2024 CloudCanvas AI</span>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Status</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Region: us-east-1</a>
+</div>
+</footer>
+</main>
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-inverse-surface flex justify-around items-center h-16 z-50 px-sm">
+<div class="flex flex-col items-center gap-1 text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim pb-1">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px]">Scans</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-surface-container-low font-body-md text-body-md">
+<span class="material-symbols-outlined">architecture</span>
+<span class="text-[10px]">Library</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-surface-container-low font-body-md text-body-md">
+<span class="material-symbols-outlined">school</span>
+<span class="text-[10px]">Lab</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-surface-container-low font-body-md text-body-md">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">Account</span>
+</div>
+</nav>
+<script>
+        // Micro-interaction for Drag and Drop
+        const dropZone = document.querySelector('.border-dashed');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('bg-primary-container/10', 'border-primary');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('bg-primary-container/10', 'border-primary');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('bg-primary-container/10', 'border-primary');
+            alert('File processing simulation started...');
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary-container');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary-container');
+        });
+    </script>
+</body></html>

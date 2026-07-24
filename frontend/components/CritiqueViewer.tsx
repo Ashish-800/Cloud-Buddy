@@ -63,7 +63,7 @@ const Skeleton: React.FC = () => (
           height: i === 0 ? 28 : 14,
           width: `${width}%`,
           borderRadius: 6,
-          background: "var(--glass-border)",
+          background: "var(--outline-variant)",
         }}
       />
     ))}
@@ -171,9 +171,9 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
               style={{
                 margin: "12px 0 16px",
                 padding: "12px 16px",
-                borderLeft: "3px solid var(--accent-indigo)",
+                borderLeft: "3px solid var(--primary-container)",
                 borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
-                background: "rgba(99, 102, 241, 0.06)",
+                background: "rgba(255, 153, 0, 0.06)",
                 fontSize: "0.8125rem",
                 color: "var(--text-secondary)",
                 lineHeight: 1.7,
@@ -220,9 +220,9 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
                   borderRadius: "4px",
                   fontSize: "0.8125rem",
                   fontFamily: "var(--font-mono), monospace",
-                  background: "rgba(99, 102, 241, 0.1)",
-                  color: "var(--accent-indigo-light)",
-                  border: "1px solid rgba(99, 102, 241, 0.15)",
+                  background: "rgba(0, 98, 160, 0.08)",
+                  color: "var(--secondary)",
+                  border: "1px solid rgba(0, 98, 160, 0.15)",
                 }}
               >
                 {children}
@@ -248,7 +248,7 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
           thead: ({ children }) => (
             <thead
               style={{
-                borderBottom: "2px solid var(--glass-border)",
+                borderBottom: "2px solid var(--outline-variant)",
               }}
             >
               {children}
@@ -264,7 +264,7 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
                 fontSize: "0.75rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
-                color: "var(--text-muted)",
+                color: "var(--on-surface-variant)",
               }}
             >
               {children}
@@ -275,8 +275,8 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
             <td
               style={{
                 padding: "8px 12px",
-                borderBottom: "1px solid var(--glass-border)",
-                color: "var(--text-secondary)",
+                borderBottom: "1px solid var(--outline-variant)",
+                color: "var(--on-surface-variant)",
               }}
             >
               {children}
@@ -289,7 +289,7 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
               style={{
                 border: "none",
                 height: 1,
-                background: "var(--glass-border)",
+                background: "var(--outline-variant)",
                 margin: "8px 0",
               }}
             />
@@ -297,7 +297,7 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
 
           /* ── Strong ───────────────────────────────────────────── */
           strong: ({ children }) => (
-            <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+            <strong style={{ color: "var(--on-surface)", fontWeight: 600 }}>
               {children}
             </strong>
           ),

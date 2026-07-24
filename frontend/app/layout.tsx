@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Work_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import ClientShell from "@/components/ClientShell";
 
 /* ── Font Configuration ──────────────────────────────────────────────── */
 
-const inter = Inter({
+const workSans = Work_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-work-sans",
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+  weight: ["400", "500"],
 });
 
 /* ── SEO Metadata ────────────────────────────────────────────────────── */
@@ -42,16 +45,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body
-        className="antialiased"
-        style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
-      >
-        {/* Ambient background glow */}
-        <div className="ambient-gradient" aria-hidden="true" />
-
-        {/* App shell */}
-        <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
+    <html lang="en" className={`${workSans.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        />
+      </head>
+      <body style={{ fontFamily: "var(--font-work-sans), 'Work Sans', system-ui, sans-serif" }}>
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );

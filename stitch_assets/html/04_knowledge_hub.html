@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CloudCanvas AI - Knowledge Hub</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "background": "#fff8f5",
+                        "surface-tint": "#8a5100",
+                        "surface-dim": "#e9d7c9",
+                        "on-tertiary-fixed": "#001e2c",
+                        "inverse-on-surface": "#ffeee0",
+                        "on-secondary-fixed-variant": "#00497a",
+                        "outline": "#887361",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#f1dfd1",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#04beff",
+                        "surface-container": "#fdebdc",
+                        "on-secondary-container": "#004472",
+                        "tertiary-fixed-dim": "#7cd0ff",
+                        "surface-container-highest": "#f1dfd1",
+                        "on-background": "#231a11",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#fff8f5",
+                        "tertiary": "#00668a",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#9ccaff",
+                        "surface": "#fff8f5",
+                        "on-surface-variant": "#554434",
+                        "inverse-primary": "#ffb86f",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#231a11",
+                        "on-primary-fixed-variant": "#693c00",
+                        "tertiary-fixed": "#c4e7ff",
+                        "outline-variant": "#dbc2ad",
+                        "secondary": "#0062a0",
+                        "surface-container-high": "#f7e5d7",
+                        "on-tertiary-fixed-variant": "#004c69",
+                        "surface-container-low": "#fff1e7",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d0e4ff",
+                        "on-primary-fixed": "#2c1600",
+                        "on-tertiary-container": "#004965",
+                        "on-secondary-fixed": "#001d35",
+                        "inverse-surface": "#392e25",
+                        "primary-fixed": "#ffdcbd",
+                        "secondary-container": "#64b3ff",
+                        "on-primary-container": "#653a00",
+                        "primary": "#8a5100",
+                        "primary-fixed-dim": "#ffb86f",
+                        "primary-container": "#ff9900"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Work Sans"],
+                        "headline-md": ["Work Sans"],
+                        "label-sm": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "display-header": ["Work Sans"],
+                        "headline-sm": ["Work Sans"],
+                        "code": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-md": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "body-lg": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-header": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-sm": ["16px", {"lineHeight": "22px", "fontWeight": "600"}],
+                        "code": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .code-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .code-container::-webkit-scrollbar-thumb {
+            background: #887361;
+            border-radius: 4px;
+        }
+        .sketch-card {
+            border: 1px solid #eaeded;
+            transition: border-color 0.2s ease;
+        }
+        .sketch-card:hover {
+            border-color: #ff9900;
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="bg-inverse-surface dark:bg-inverse-surface text-primary-fixed dark:text-primary-fixed-dim docked full-width top-0 z-50 flex justify-between items-center w-full px-md h-[48px] fixed">
+<div class="flex items-center gap-md">
+<span class="font-display-header text-display-header text-on-primary-fixed-variant dark:text-primary-fixed-dim">CloudCanvas</span>
+<div class="hidden md:flex ml-lg gap-md">
+<a class="text-surface-container-low font-body-md text-body-md hover:bg-on-surface-variant/20 hover:text-white transition-colors duration-150 px-sm py-1" href="#">Services</a>
+<a class="text-surface-container-low font-body-md text-body-md hover:bg-on-surface-variant/20 hover:text-white transition-colors duration-150 px-sm py-1" href="#">Projects</a>
+</div>
+</div>
+<div class="flex-1 max-w-xl mx-lg hidden md:block">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-white border-none h-8 pl-xl pr-md text-body-md font-body-md focus:ring-2 focus:ring-primary-container" placeholder="Search Documentation" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="material-symbols-outlined p-sm hover:bg-on-surface-variant/20 transition-colors duration-150">notifications</button>
+<button class="material-symbols-outlined p-sm hover:bg-on-surface-variant/20 transition-colors duration-150">help</button>
+<button class="material-symbols-outlined p-sm hover:bg-on-surface-variant/20 transition-colors duration-150">settings</button>
+<div class="h-8 w-8 ml-sm overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a technical cloud architect with a confident expression, set against a blurred high-tech workspace with soft blue and orange ambient lighting. The style is modern corporate photography, clean and well-lit with high contrast and professional clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSyA30l19Q_k4mQc6Z4TQxEMf8ryJKwKkJnsI9vSVkXXk2A0nXdpeiwCu3TpHxKw11UPdSavtcKyOz7PKw6ODDicwgnoZWwS_8ezP4UrSVqv4yEi3LyRKggLGXckGk3uab7BH7e2Zh87HmZNb0bxiD-YJcDjgkZ6XQ3fqoSeG01K2Wnb7gCxLVNoJu2JDF-Voyd4sWUAKwADMmjrhxHNw20sqYhmvl56XsqMY-9zkyoUBJm46XNZeJ5bsYotzOK0bz_PQ75PhY708W"/>
+</div>
+</div>
+</header>
+<!-- Sidebar & Content Layout -->
+<div class="flex pt-[48px] min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 h-full w-[240px] bg-surface-dim dark:bg-surface-dim border-r border-outline-variant flex flex-col hidden md:flex overflow-y-auto">
+<div class="p-md flex items-center gap-sm">
+<div class="w-8 h-8 bg-primary rounded-sm flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">architecture</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Knowledge Base</h2>
+<p class="text-[10px] text-on-surface-variant font-label-sm uppercase tracking-wider">Cloud Architecture Assistant</p>
+</div>
+</div>
+<nav class="flex flex-col gap-xs p-sm">
+<div class="px-sm py-xs">
+<span class="text-on-surface-variant font-label-sm text-[10px] uppercase">Core Concepts</span>
+</div>
+<a class="font-bold text-on-surface bg-surface-container-high border-l-2 border-primary-container flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[18px]">architecture</span>
+<span class="font-body-md text-body-md">My Architectures</span>
+</a>
+<a class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[18px]">database</span>
+<span class="font-body-md text-body-md">Knowledge Base</span>
+</a>
+<a class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[18px]">history</span>
+<span class="font-body-md text-body-md">Recent Scans</span>
+</a>
+<div class="mt-md px-sm py-xs">
+<span class="text-on-surface-variant font-label-sm text-[10px] uppercase">Whitepapers</span>
+</div>
+<a class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[18px]">article</span>
+<span class="font-body-md text-body-md">Networking Best Practices</span>
+</a>
+<a class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm px-sm py-2 hover:bg-surface-container-highest hover:text-on-surface transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[18px]">security</span>
+<span class="font-body-md text-body-md">Security Foundations</span>
+</a>
+<div class="mt-auto pt-lg">
+<button class="w-full bg-primary-container text-on-primary-container font-headline-sm text-headline-sm py-2 hover:opacity-90 transition-opacity">
+                        Upgrade to Pro
+                    </button>
+</div>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[240px] p-lg max-w-5xl mx-auto">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-xs text-body-md mb-lg">
+<a class="text-secondary hover:underline" href="#">Knowledge Hub</a>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">chevron_right</span>
+<a class="text-secondary hover:underline" href="#">Networking</a>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">chevron_right</span>
+<span class="text-on-surface-variant">VPC Architecture &amp; Subnets</span>
+</nav>
+<section class="mb-xl">
+<h1 class="font-display-header text-[32px] text-on-surface mb-sm">Amazon VPC Architecture Foundation</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
+                    Amazon Virtual Private Cloud (Amazon VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define.
+                </p>
+</section>
+<!-- Whiteboard Visualization Segment -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg mb-xl">
+<div class="lg:col-span-2 sketch-card bg-white p-lg relative overflow-hidden">
+<div class="flex items-center justify-between mb-md">
+<span class="font-headline-sm text-headline-sm text-primary">Architecture Sketch</span>
+<span class="text-[10px] bg-primary-fixed px-2 py-0.5 font-label-sm rounded-full">LIVE WHITEBOARD</span>
+</div>
+<div class="relative w-full aspect-video bg-surface-container-low rounded-lg border border-outline-variant border-dashed p-md flex items-center justify-center">
+<!-- Animated Diagram Component -->
+<div class="absolute inset-0 z-0">
+
+</div>
+<!-- Static Overlay Sketch -->
+<div class="z-10 w-full h-full flex items-center justify-center relative">
+<div class="border-4 border-primary-container/40 p-lg w-4/5 h-4/5 relative flex flex-col justify-between">
+<span class="absolute -top-3 left-4 bg-white px-2 font-label-sm text-primary">VPC (10.0.0.0/16)</span>
+<div class="flex gap-lg h-full pt-md">
+<!-- Public Subnet -->
+<div class="flex-1 border-2 border-secondary-container/60 bg-white/80 p-md relative">
+<span class="absolute -top-3 left-2 bg-white px-1 text-[10px] font-label-sm text-secondary">Public Subnet</span>
+<div class="flex flex-col gap-sm">
+<div class="h-10 w-full bg-secondary-fixed/30 rounded flex items-center justify-center border border-secondary">
+<span class="material-symbols-outlined text-secondary">public</span>
+</div>
+<div class="h-4 w-12 bg-outline-variant/30 rounded"></div>
+</div>
+</div>
+<!-- Private Subnet -->
+<div class="flex-1 border-2 border-outline/40 bg-white/80 p-md relative">
+<span class="absolute -top-3 left-2 bg-white px-1 text-[10px] font-label-sm text-outline">Private Subnet</span>
+<div class="flex flex-col gap-sm">
+<div class="h-10 w-full bg-surface-container-high rounded flex items-center justify-center border border-outline">
+<span class="material-symbols-outlined text-outline">lock</span>
+</div>
+<div class="h-4 w-12 bg-outline-variant/30 rounded"></div>
+</div>
+</div>
+</div>
+<!-- IGW -->
+<div class="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-4 border-primary-container bg-white flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[24px]">cloud_sync</span>
+<span class="absolute -bottom-5 text-[9px] font-bold whitespace-nowrap">Internet GW</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-md grid grid-cols-2 gap-md">
+<div class="p-sm bg-surface-container-lowest border border-outline-variant">
+<h4 class="font-headline-sm text-[12px] mb-1">Public Subnets</h4>
+<p class="text-[11px] text-on-surface-variant">Associated with a route table that has a route to an Internet Gateway (IGW).</p>
+</div>
+<div class="p-sm bg-surface-container-lowest border border-outline-variant">
+<h4 class="font-headline-sm text-[12px] mb-1">Private Subnets</h4>
+<p class="text-[11px] text-on-surface-variant">Used for internal backend resources; requires NAT Gateway for internet access.</p>
+</div>
+</div>
+</div>
+<div class="space-y-lg">
+<div class="bg-white border border-outline-variant p-md">
+<h3 class="font-headline-sm text-headline-sm mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+                            Key Takeaways
+                        </h3>
+<ul class="space-y-sm">
+<li class="flex gap-sm">
+<span class="text-primary font-bold">•</span>
+<p class="text-body-md">One VPC spans multiple AZs in a Region.</p>
+</li>
+<li class="flex gap-sm">
+<span class="text-primary font-bold">•</span>
+<p class="text-body-md">Subnets are mapped to specific AZs.</p>
+</li>
+<li class="flex gap-sm">
+<span class="text-primary font-bold">•</span>
+<p class="text-body-md">Default VPC limits are 5 per region.</p>
+</li>
+</ul>
+</div>
+<div class="w-full aspect-square bg-cover bg-center border border-outline-variant" data-alt="A clean, minimalist 3D rendering of cloud networking icons like routers and servers floating in an organized grid. The color palette is high-contrast white and AWS orange, symbolizing data flow and connectivity. The lighting is bright and industrial, reflecting a professional technical workspace." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBa4iezI2-kI7SwMXSqz1I5_9VBPQkHH0rpwY-HkxXJEEgLi4LeuXmfaJfyNefj9_wnAUfJ8Duuf1Nmmv-SyoLc_JOdMNXr0ogM6PQxyERAscCIKSxZfJMpvRBz1_CsoxvSksXHKaHEE2GQwWVxZ9TWFt7MZZPJCGqbQaH7wVtmt7hgOnR4pvBPf4HBaWyQmZ5180d1hbTRORbUZf0PJR_kgLvbFLuwuyavMaM1JgI8gEW9ABuwk-W3tni4x5SMEzEq6PC05GNzuqK6')"></div>
+</div>
+</div>
+<!-- Code Blocks Section -->
+<section class="mb-xl">
+<h2 class="font-headline-md text-headline-md mb-md">Implementation with Terraform</h2>
+<div class="bg-inverse-surface rounded-lg overflow-hidden border border-outline">
+<div class="flex items-center justify-between px-md py-2 bg-on-surface-variant/20 border-b border-white/10">
+<span class="text-[11px] font-code text-primary-fixed-dim uppercase tracking-widest">main.tf</span>
+<button class="flex items-center gap-xs text-[11px] text-surface-container-low hover:text-white transition-colors" onclick="copyCode(this)">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+                            Copy
+                        </button>
+</div>
+<div class="p-md code-container overflow-x-auto">
+<pre class="font-code text-code leading-relaxed text-surface-container-low"><span class="text-primary-fixed">resource</span> <span class="text-secondary-fixed">"aws_vpc"</span> <span class="text-tertiary-fixed">"main"</span> {
+  cidr_block       = <span class="text-primary-fixed">"10.0.0.0/16"</span>
+  instance_tenancy = <span class="text-primary-fixed">"default"</span>
+
+  <span class="text-on-surface-variant"># Tagging for visibility</span>
+  tags = {
+    Name = <span class="text-primary-fixed">"Production-VPC"</span>
+    Env  = <span class="text-primary-fixed">"Prod"</span>
+  }
+}
+
+<span class="text-primary-fixed">resource</span> <span class="text-secondary-fixed">"aws_subnet"</span> <span class="text-tertiary-fixed">"public"</span> {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = <span class="text-primary-fixed">"10.0.1.0/24"</span>
+  
+  tags = { Name = <span class="text-primary-fixed">"Public-Subnet-AZ1"</span> }
+}</pre>
+</div>
+</div>
+<div class="mt-md p-md bg-tertiary/10 border-l-4 border-tertiary">
+<p class="font-body-md text-on-tertiary-container italic">
+<strong>Expert Tip:</strong> Always enable <span class="font-code text-[11px]">dns_hostnames</span> and <span class="font-code text-[11px]">dns_support</span> in your VPC configuration to ensure proper service discovery within the cloud environment.
+                    </p>
+</div>
+</section>
+<!-- Table-based Information Grid -->
+<section class="mb-xl">
+<h2 class="font-headline-md text-headline-md mb-md">Comparison: NACLs vs Security Groups</h2>
+<div class="overflow-x-auto border border-outline-variant">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high">
+<th class="p-md font-headline-sm text-[12px] border-b border-outline-variant">Feature</th>
+<th class="p-md font-headline-sm text-[12px] border-b border-outline-variant">Security Groups</th>
+<th class="p-md font-headline-sm text-[12px] border-b border-outline-variant">Network ACLs</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr>
+<td class="p-md font-bold text-body-md">Scope</td>
+<td class="p-md text-body-md">Instance Level</td>
+<td class="p-md text-body-md">Subnet Level</td>
+</tr>
+<tr class="bg-white">
+<td class="p-md font-bold text-body-md">Stateful?</td>
+<td class="p-md text-body-md text-primary font-bold">Yes (Stateful)</td>
+<td class="p-md text-body-md">No (Stateless)</td>
+</tr>
+<tr>
+<td class="p-md font-bold text-body-md">Rules</td>
+<td class="p-md text-body-md">Allow rules only</td>
+<td class="p-md text-body-md">Allow &amp; Deny rules</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-surface-container-highest border-t border-outline-variant w-full py-sm flex justify-center items-center gap-lg mt-auto">
+<span class="font-label-sm text-label-sm text-on-surface-variant">© 2024 CloudCanvas AI</span>
+<div class="flex gap-md">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Status</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Region</a>
+</div>
+</footer>
+<!-- FAB (Contextual) -->
+<button class="fixed bottom-lg right-lg bg-primary-container text-on-primary-container w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform active:scale-95 group">
+<span class="material-symbols-outlined text-[24px]">chat_bubble</span>
+<span class="absolute right-full mr-md bg-inverse-surface text-white px-md py-xs text-[12px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Ask Assistant</span>
+</button>
+<script>
+        function copyCode(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined text-[14px]">check</span> Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Simple scroll spy behavior for active state (simulated)
+        window.addEventListener('scroll', () => {
+            const sidebarLinks = document.querySelectorAll('aside nav a');
+            // Logic to highlight based on scroll could go here
+        });
+    </script>
+</body></html>

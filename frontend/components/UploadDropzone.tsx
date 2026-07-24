@@ -2,7 +2,7 @@
 
 import React, { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Image as ImageIcon, X, FileImage } from "lucide-react";
+import { Upload, X, FileImage } from "lucide-react";
 
 /* ── Types ────────────────────────────────────────────────────────────── */
 
@@ -140,8 +140,8 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
               style={{
                 width: 56,
                 height: 56,
-                borderRadius: "var(--radius-md)",
-                background: "rgba(99, 102, 241, 0.1)",
+                borderRadius: "var(--radius-lg)",
+                background: "rgba(255, 153, 0, 0.08)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -149,16 +149,16 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
             >
               <Upload
                 size={24}
-                color={isDragOver ? "var(--accent-indigo-light)" : "var(--text-muted)"}
+                color={isDragOver ? "var(--primary-container)" : "var(--on-surface-variant)"}
               />
             </motion.div>
 
             <div style={{ textAlign: "center" }}>
               <p
                 style={{
-                  fontSize: "0.9375rem",
+                  fontSize: "14px",
                   fontWeight: 600,
-                  color: "var(--text-primary)",
+                  color: "var(--on-surface)",
                   margin: "0 0 4px",
                 }}
               >
@@ -166,8 +166,8 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
               </p>
               <p
                 style={{
-                  fontSize: "0.8125rem",
-                  color: "var(--text-muted)",
+                  fontSize: "12px",
+                  color: "var(--on-surface-variant)",
                   margin: 0,
                 }}
               >
@@ -183,7 +183,7 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.25 }}
-            className="glass-panel"
+            className="card"
             style={{
               padding: "16px",
               display: "flex",
@@ -197,9 +197,9 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
                 position: "relative",
                 width: "100%",
                 aspectRatio: "16 / 10",
-                borderRadius: "var(--radius-sm)",
+                borderRadius: "var(--radius-md)",
                 overflow: "hidden",
-                background: "var(--bg-secondary)",
+                background: "var(--surface-container-low)",
               }}
             >
               {previewUrl && (
@@ -230,14 +230,13 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
                     width: 28,
                     height: 28,
                     borderRadius: "50%",
-                    background: "rgba(0, 0, 0, 0.6)",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid var(--glass-border)",
+                    background: "rgba(0, 0, 0, 0.5)",
+                    border: "1px solid rgba(255,255,255,0.2)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
-                    color: "var(--text-secondary)",
+                    color: "white",
                   }}
                   aria-label="Remove image"
                 >
@@ -253,17 +252,17 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
                 alignItems: "center",
                 gap: "10px",
                 padding: "8px 12px",
-                borderRadius: "var(--radius-sm)",
-                background: "var(--bg-secondary)",
+                borderRadius: "var(--radius-md)",
+                background: "var(--surface-container-low)",
               }}
             >
-              <FileImage size={16} color="var(--accent-indigo-light)" />
+              <FileImage size={16} color="var(--primary-container)" />
               <span
                 style={{
                   flex: 1,
-                  fontSize: "0.8125rem",
+                  fontSize: "13px",
                   fontWeight: 500,
-                  color: "var(--text-primary)",
+                  color: "var(--on-surface)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -273,9 +272,9 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
               </span>
               <span
                 style={{
-                  fontSize: "0.75rem",
-                  color: "var(--text-muted)",
-                  fontFamily: "var(--font-mono), monospace",
+                  fontSize: "12px",
+                  color: "var(--on-surface-variant)",
+                  fontFamily: "'JetBrains Mono', monospace",
                   flexShrink: 0,
                 }}
               >

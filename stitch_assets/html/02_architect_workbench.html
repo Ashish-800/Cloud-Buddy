@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CloudCanvas - Architect Workbench</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Work Sans for UI, JetBrains Mono for Code -->
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-error-container": "#93000a",
+                "background": "#fff8f5",
+                "surface-tint": "#8a5100",
+                "surface-dim": "#e9d7c9",
+                "on-tertiary-fixed": "#001e2c",
+                "inverse-on-surface": "#ffeee0",
+                "on-secondary-fixed-variant": "#00497a",
+                "outline": "#887361",
+                "error": "#ba1a1a",
+                "on-error": "#ffffff",
+                "surface-variant": "#f1dfd1",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-container": "#04beff",
+                "surface-container": "#fdebdc",
+                "on-secondary-container": "#004472",
+                "tertiary-fixed-dim": "#7cd0ff",
+                "surface-container-highest": "#f1dfd1",
+                "on-background": "#231a11",
+                "on-secondary": "#ffffff",
+                "surface-bright": "#fff8f5",
+                "tertiary": "#00668a",
+                "on-tertiary": "#ffffff",
+                "secondary-fixed-dim": "#9ccaff",
+                "surface": "#fff8f5",
+                "on-surface-variant": "#554434",
+                "inverse-primary": "#ffb86f",
+                "on-primary": "#ffffff",
+                "on-surface": "#231a11",
+                "on-primary-fixed-variant": "#693c00",
+                "tertiary-fixed": "#c4e7ff",
+                "outline-variant": "#dbc2ad",
+                "secondary": "#0062a0",
+                "surface-container-high": "#f7e5d7",
+                "on-tertiary-fixed-variant": "#004c69",
+                "surface-container-low": "#fff1e7",
+                "error-container": "#ffdad6",
+                "secondary-fixed": "#d0e4ff",
+                "on-primary-fixed": "#2c1600",
+                "on-tertiary-container": "#004965",
+                "on-secondary-fixed": "#001d35",
+                "inverse-surface": "#392e25",
+                "primary-fixed": "#ffdcbd",
+                "secondary-container": "#64b3ff",
+                "on-primary-container": "#653a00",
+                "primary": "#8a5100",
+                "primary-fixed-dim": "#ffb86f",
+                "primary-container": "#ff9900"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "unit": "4px",
+                "margin-desktop": "24px",
+                "sm": "8px",
+                "md": "16px",
+                "xs": "4px",
+                "lg": "24px",
+                "margin-mobile": "16px",
+                "xl": "32px",
+                "gutter": "20px"
+            },
+            "fontFamily": {
+                "body-md": ["Work Sans"],
+                "headline-md": ["Work Sans"],
+                "label-sm": ["Work Sans"],
+                "body-lg": ["Work Sans"],
+                "display-header": ["Work Sans"],
+                "headline-sm": ["Work Sans"],
+                "code": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                "body-md": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                "label-sm": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                "body-lg": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "display-header": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "headline-sm": ["16px", {"lineHeight": "22px", "fontWeight": "600"}],
+                "code": ["12px", {"lineHeight": "18px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #f2f3f3; /* AWS Neutral Gray */
+        }
+        .aws-border { border: 1px solid #eaeded; }
+        .code-block { font-family: 'JetBrains Mono', monospace; }
+        .canvas-grid {
+            background-image: radial-gradient(#dbc2ad 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f2f3f3; }
+        ::-webkit-scrollbar-thumb { background: #dbc2ad; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #887361; }
+    </style>
+</head>
+<body class="overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-inverse-surface dark:bg-inverse-surface flex justify-between items-center w-full px-md h-[48px] fixed top-0 z-50 select-none">
+<div class="flex items-center gap-md">
+<span class="font-display-header text-display-header text-on-primary-fixed-variant dark:text-primary-fixed-dim cursor-pointer">CloudCanvas</span>
+<div class="hidden md:flex items-center gap-md ml-lg">
+<a class="text-surface-container-low font-body-md text-body-md hover:bg-on-surface-variant/20 hover:text-white transition-colors duration-150 px-sm py-1">Services</a>
+<a class="text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim pb-1 px-sm py-1">Projects</a>
+</div>
+<div class="relative group ml-lg w-96">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-white text-on-surface rounded-sm pl-sm border-none focus:ring-1 focus:ring-primary h-[32px] font-body-md text-body-md placeholder:text-on-surface-variant/60" placeholder="Search architecture components..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-xs hover:bg-on-surface-variant/20 transition-colors rounded-sm">
+<span class="material-symbols-outlined text-white">notifications</span>
+</button>
+<button class="p-xs hover:bg-on-surface-variant/20 transition-colors rounded-sm">
+<span class="material-symbols-outlined text-white">help</span>
+</button>
+<button class="p-xs hover:bg-on-surface-variant/20 transition-colors rounded-sm">
+<span class="material-symbols-outlined text-white">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center ml-sm overflow-hidden border border-white/20">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a cloud architect wearing a modern dark suit, clean lighting, high resolution, minimalist office background, orange and charcoal accents in the scene." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpT0tkDS87dZcrr0HC0GWhog9GTP_kW9oP3WqD6aCH4QedOXGa0BBr2ajm7e04vtDoCt7DV98WKRlScjKx2O-KRBEQF6Wu5N8MaltnsZP_z7ShIGLV4WcfIJxZ_foFh1LM4TCTwWlAbpPjOqw4zz5BCHBoXwLQrvFna7J3_6HKtUxDp4tdLkcRnthbsGHVgUkjotYzNFv1gP_iPWNLU-UGKaZokqfsjAfzrD9CfNkzF2h8vTT9noiLREFWY2oLNuNuMvkIrZ0qamhv"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Left) -->
+<aside class="fixed left-0 h-full w-[240px] pt-[48px] bg-surface-dim dark:bg-surface-dim border-r border-outline-variant flex flex-col gap-xs p-sm z-40">
+<div class="px-sm py-md">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Navigation</h2>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-70">Cloud Architecture Assistant</p>
+</div>
+<nav class="flex flex-col gap-1">
+<div class="font-bold text-on-surface bg-surface-container-high border-l-2 border-primary-container flex items-center gap-sm p-sm hover:bg-surface-container-highest transition-all duration-150 cursor-pointer select-none">
+<span class="material-symbols-outlined text-primary">architecture</span>
+<span class="font-body-md text-body-md">My Architectures</span>
+</div>
+<div class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm p-sm hover:bg-surface-container-highest transition-all duration-150 cursor-pointer select-none">
+<span class="material-symbols-outlined">database</span>
+<span class="font-body-md text-body-md">Knowledge Base</span>
+</div>
+<div class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm p-sm hover:bg-surface-container-highest transition-all duration-150 cursor-pointer select-none">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Recent Scans</span>
+</div>
+<div class="text-on-surface-variant font-body-md text-body-md flex items-center gap-sm p-sm hover:bg-surface-container-highest transition-all duration-150 cursor-pointer select-none mt-4">
+<span class="material-symbols-outlined">grade</span>
+<span class="font-body-md text-body-md">Upgrade to Pro</span>
+</div>
+</nav>
+<button class="mt-auto mb-16 bg-primary-container text-on-primary-container font-label-sm text-label-sm p-md flex items-center justify-center gap-2 rounded-sm active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+            Create New Design
+        </button>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] mt-[48px] mr-[320px] h-[calc(100vh-48px)] flex flex-col bg-white">
+<!-- Breadcrumbs & Toolbar -->
+<div class="h-12 border-b border-outline-variant px-md flex items-center justify-between bg-white shrink-0">
+<div class="flex items-center gap-2 text-body-md font-body-md">
+<a class="text-secondary hover:underline" href="#">CloudCanvas</a>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">chevron_right</span>
+<a class="text-secondary hover:underline" href="#">Architectures</a>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">chevron_right</span>
+<span class="text-on-surface">My-New-Architecture</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex bg-surface-container rounded-sm p-0.5 border border-outline-variant">
+<button class="px-3 py-1 bg-white shadow-sm rounded-sm text-body-md font-bold">Edit</button>
+<button class="px-3 py-1 text-on-surface-variant text-body-md hover:bg-surface-container-high transition-colors">Analyze</button>
+</div>
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-white px-md py-1 rounded-sm text-label-sm transition-colors">Deploy</button>
+</div>
+</div>
+<!-- Warning Banners -->
+<div class="p-sm flex flex-col gap-2">
+<div class="bg-[#fff4e5] border-l-4 border-primary-container p-3 flex items-start gap-md">
+<span class="material-symbols-outlined text-primary-container">warning</span>
+<div>
+<h4 class="font-bold text-body-md text-on-surface">Potential cost spike detected</h4>
+<p class="text-body-md text-on-surface-variant">The current configuration for Multi-Region failover may increase monthly costs by ~45%.</p>
+</div>
+<button class="ml-auto material-symbols-outlined text-on-surface-variant text-sm">close</button>
+</div>
+<div class="bg-[#fdf3f2] border-l-4 border-error p-3 flex items-start gap-md">
+<span class="material-symbols-outlined text-error">error</span>
+<div>
+<h4 class="font-bold text-body-md text-on-surface">Security vulnerability found</h4>
+<p class="text-body-md text-on-surface-variant">S3 Bucket 'static-assets' is configured with public-read access. Terraform plan will fail validation.</p>
+</div>
+<button class="ml-auto material-symbols-outlined text-on-surface-variant text-sm">close</button>
+</div>
+</div>
+<!-- Workbench Canvas -->
+<div class="flex-1 overflow-hidden relative canvas-grid bg-white">
+<!-- Whiteboard Elements -->
+<div class="absolute inset-0 p-xl flex flex-wrap gap-xl items-start justify-center opacity-80">
+<!-- Architecture Card 1 -->
+<div class="bg-white border border-outline-variant rounded-sm p-md w-72 shadow-sm relative group cursor-move">
+<div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-xs">
+<span class="material-symbols-outlined text-secondary">cloud</span>
+<span class="font-headline-sm text-headline-sm">AWS VPC</span>
+<span class="ml-auto material-symbols-outlined text-xs text-outline opacity-0 group-hover:opacity-100 transition-opacity">more_vert</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center bg-surface-container-low p-xs rounded-sm">
+<span class="text-body-md text-on-surface-variant">Public Subnet</span>
+<span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed px-1 rounded">10.0.1.0/24</span>
+</div>
+<div class="flex justify-between items-center bg-surface-container-low p-xs rounded-sm">
+<span class="text-body-md text-on-surface-variant">Private Subnet</span>
+<span class="text-[10px] bg-secondary-fixed text-on-secondary-fixed px-1 rounded">10.0.2.0/24</span>
+</div>
+</div>
+</div>
+<!-- Architecture Card 2 -->
+<div class="bg-white border border-outline-variant rounded-sm p-md w-64 shadow-sm relative group cursor-move">
+<div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-xs">
+<span class="material-symbols-outlined text-primary">dns</span>
+<span class="font-headline-sm text-headline-sm">EC2 Cluster</span>
+</div>
+<div class="h-32 rounded-sm border border-dashed border-outline-variant flex items-center justify-center bg-surface-container-low/50">
+<img class="w-full h-full object-contain p-2" data-alt="Detailed 3D visualization of a cluster of server nodes with glowing blue connection lines, representing auto-scaling groups in a cloud environment, minimalist isometric style, sharp focus, clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZ5fBfMPV7PDGDBi0Nhru7OUMN8KhP-jpTa2xJs6s-1LsG0C2v8k0Zye1YDX7L8hkj37sBNWSSYYPhCl2vpmXutQf9UJIcrsOjTQx50qrWgqoHmWyrg-8xquo4lS1R4f8OsKLlWOiuFe8IdpSlSKI8JXw6JVHwBqZ8p8VpRgul8bnAWRR3v2ecwgGO6tEiY8dOO13d-yqy7erGvFeJbpoA1EOAn25WYUmX1tG5bZAqiOrpm5ilDY1qFWPjWl-OCKUn7yRx2jedr8u_"/>
+</div>
+</div>
+<!-- AI Overlay Connection -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40">
+<path d="M300,200 Q450,250 550,220" fill="transparent" stroke="#ff9900" stroke-dasharray="5,5" stroke-width="2"></path>
+<circle cx="300" cy="200" fill="#ff9900" r="4"></circle>
+<circle cx="550" cy="220" fill="#ff9900" r="4"></circle>
+</svg>
+</div>
+<!-- Canvas Controls -->
+<div class="absolute bottom-md left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-outline-variant rounded-full p-2 shadow-lg px-md">
+<button class="p-2 hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined">zoom_in</span></button>
+<button class="p-2 hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined">zoom_out</span></button>
+<div class="h-6 w-[1px] bg-outline-variant mx-1"></div>
+<button class="p-2 hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined">undo</span></button>
+<button class="p-2 hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined">redo</span></button>
+<div class="h-6 w-[1px] bg-outline-variant mx-1"></div>
+<button class="p-2 hover:bg-surface-container-high rounded-full text-primary"><span class="material-symbols-outlined">auto_fix</span></button>
+</div>
+</div>
+</main>
+<!-- Right Sidebar - Intelligence & Terraform -->
+<aside class="fixed right-0 top-[48px] h-[calc(100vh-48px)] w-[320px] bg-white border-l border-outline-variant flex flex-col z-40">
+<!-- Intelligence Section -->
+<div class="flex-1 flex flex-col border-b border-outline-variant min-h-0">
+<div class="p-md bg-surface-container-low border-b border-outline-variant flex items-center gap-sm shrink-0">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<h3 class="font-headline-sm text-headline-sm">Intelligence</h3>
+</div>
+<div class="flex-1 overflow-y-auto p-md space-y-md">
+<div class="space-y-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Anti-Patterns</p>
+<div class="bg-surface-container p-sm rounded-sm space-y-xs border border-outline-variant/30">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-error text-[18px]">cancel</span>
+<span class="font-bold text-body-md">Hardcoded Credentials</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Detected plain-text access keys in user data scripts.</p>
+</div>
+</div>
+<div class="space-y-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Critiques</p>
+<div class="bg-surface-container-low p-sm rounded-sm space-y-xs border border-outline-variant/30">
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined text-[18px]">lightbulb</span>
+<span class="font-bold text-body-md">Cost Optimization</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Switching to Graviton3 instances (t4g) could reduce costs by 20% for this workload.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Terraform Lab -->
+<div class="flex-1 flex flex-col min-h-0 bg-[#232f3e] text-white">
+<div class="p-md bg-[#161e2d] border-b border-white/10 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary-container">terminal</span>
+<h3 class="font-headline-sm text-headline-sm">Terraform Lab</h3>
+</div>
+<span class="text-xs text-secondary-fixed opacity-60">main.tf</span>
+</div>
+<div class="flex-1 overflow-y-auto p-md code-block text-code bg-[#1e2631]">
+<pre class="whitespace-pre-wrap"><span class="text-primary-fixed-dim">resource</span> <span class="text-tertiary-fixed-dim">"aws_vpc"</span> "main" {
+  cidr_block = <span class="text-secondary-fixed">"10.0.0.0/16"</span>
+  
+  <span class="text-on-surface-variant"># Multi-region optimization enabled</span>
+  enable_dns_hostnames = <span class="text-secondary-fixed-dim">true</span>
+  
+  tags = {
+    Name = <span class="text-secondary-fixed">"cloud-canvas-vpc"</span>
+  }
+}
+
+<span class="text-primary-fixed-dim">resource</span> <span class="text-tertiary-fixed-dim">"aws_subnet"</span> "public" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = <span class="text-secondary-fixed">"10.0.1.0/24"</span>
+}</pre>
+</div>
+<div class="p-sm bg-[#161e2d] flex gap-sm shrink-0">
+<button class="flex-1 bg-secondary text-white py-1.5 rounded-sm text-label-sm font-bold hover:bg-secondary-container transition-colors">Copy</button>
+<button class="flex-1 bg-white/10 text-white py-1.5 rounded-sm text-label-sm font-bold hover:bg-white/20 transition-colors">Validate</button>
+</div>
+</div>
+</aside>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full bg-surface-container dark:bg-surface-container-highest border-t border-outline-variant h-[32px] flex items-center px-md z-50">
+<div class="flex justify-between items-center w-full">
+<div class="flex gap-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant">© 2024 CloudCanvas AI</span>
+<div class="flex gap-md">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#">Status</a>
+<a class="text-secondary font-bold underline font-body-md text-body-md" href="#">us-east-1</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Live Analysis Active</span>
+</div>
+</div>
+</footer>
+<!-- Interactive script for demo -->
+<script>
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.add('opacity-70');
+                setTimeout(() => this.classList.remove('opacity-70'), 100);
+            });
+        });
+    </script>
+</body></html>

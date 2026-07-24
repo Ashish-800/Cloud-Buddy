@@ -60,7 +60,7 @@ const ProviderSelector: React.FC<ProviderSelectorProps> = ({
           fontWeight: 600,
           textTransform: "uppercase",
           letterSpacing: "0.06em",
-          color: "var(--text-muted)",
+          color: "var(--on-surface-variant)",
           margin: "0 0 8px",
         }}
       >
@@ -104,8 +104,8 @@ const ProviderSelector: React.FC<ProviderSelectorProps> = ({
                     position: "absolute",
                     inset: 0,
                     borderRadius: "999px",
-                    background: "rgba(99, 102, 241, 0.1)",
-                    border: "1px solid var(--accent-indigo)",
+                    background: "rgba(255, 153, 0, 0.1)",
+                    border: "1px solid var(--primary-container)",
                   }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />

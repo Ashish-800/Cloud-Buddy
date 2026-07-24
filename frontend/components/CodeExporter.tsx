@@ -35,13 +35,13 @@ const CopyToast: React.FC<{ visible: boolean }> = ({ visible }) => (
           gap: "8px",
           padding: "10px 16px",
           borderRadius: "var(--radius-md)",
-          background: "rgba(52, 211, 153, 0.15)",
-          border: "1px solid rgba(52, 211, 153, 0.3)",
+          background: "rgba(34, 197, 94, 0.12)",
+          border: "1px solid rgba(34, 197, 94, 0.25)",
           backdropFilter: "blur(12px)",
-          color: "var(--accent-emerald)",
+          color: "#22c55e",
           fontSize: "0.8125rem",
           fontWeight: 600,
-          boxShadow: "var(--glow-emerald)",
+          boxShadow: "0 2px 8px rgba(34, 197, 94, 0.2)",
         }}
       >
         <Check size={15} />
@@ -65,7 +65,7 @@ const CodeSkeleton: React.FC = () => (
           width: `${30 + Math.random() * 60}%`,
           marginLeft: i % 3 !== 0 ? (i % 5 === 0 ? 48 : 24) : 0,
           borderRadius: 4,
-          background: "var(--glass-border)",
+          background: "var(--outline-variant)",
         }}
       />
     ))}
@@ -84,7 +84,7 @@ const customStyle: Record<string, React.CSSProperties> = {
   },
   'pre[class*="language-"]': {
     ...(vscDarkPlus['pre[class*="language-"]'] as React.CSSProperties),
-    background: "var(--bg-primary)",
+    background: "#1e2631",
     margin: 0,
     padding: "20px",
     borderRadius: 0,
@@ -154,16 +154,16 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
             width: 48,
             height: 48,
             borderRadius: "var(--radius-md)",
-            background: "rgba(52, 211, 153, 0.08)",
-            border: "1px solid var(--glass-border)",
+            background: "rgba(0, 98, 160, 0.06)",
+            border: "1px solid var(--outline-variant)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <FileCode2 size={20} color="var(--text-muted)" />
+          <FileCode2 size={20} color="var(--on-surface-variant)" />
         </div>
-        <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", margin: 0 }}>
+        <p style={{ fontSize: "0.875rem", color: "var(--on-surface-variant)", margin: 0 }}>
           Terraform code will appear here after analysis.
         </p>
       </div>
@@ -184,19 +184,19 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
           alignItems: "center",
           gap: "8px",
           padding: "10px 16px",
-          borderBottom: "1px solid var(--glass-border)",
-          background: "var(--bg-secondary)",
-          borderRadius: "var(--radius-sm) var(--radius-sm) 0 0",
+          borderBottom: "1px solid var(--outline-variant)",
+          background: "var(--surface-container)",
+          borderRadius: "var(--radius-md) var(--radius-md) 0 0",
         }}
       >
         {/* File label */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1 }}>
-          <FileCode2 size={14} color="var(--accent-emerald)" />
+          <FileCode2 size={14} color="#22c55e" />
           <span
             style={{
               fontSize: "0.75rem",
               fontWeight: 600,
-              color: "var(--text-secondary)",
+              color: "var(--on-surface-variant)",
               fontFamily: "var(--font-mono), monospace",
             }}
           >
@@ -205,7 +205,7 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
           <span
             style={{
               fontSize: "0.6875rem",
-              color: "var(--text-muted)",
+              color: "var(--on-surface-variant)",
               fontFamily: "var(--font-mono), monospace",
             }}
           >
@@ -233,8 +233,8 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
             transition: "border-color 0.2s, background 0.2s",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-indigo)";
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(99, 102, 241, 0.08)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--primary-container)";
+            (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 153, 0, 0.06)";
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--glass-border)";
@@ -265,8 +265,8 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
             transition: "border-color 0.2s, background 0.2s",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent-emerald)";
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(52, 211, 153, 0.08)";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "#22c55e";
+            (e.currentTarget as HTMLButtonElement).style.background = "rgba(34, 197, 94, 0.06)";
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--glass-border)";
@@ -283,7 +283,7 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
         style={{
           flex: 1,
           overflow: "auto",
-          borderRadius: "0 0 var(--radius-sm) var(--radius-sm)",
+          borderRadius: "0 0 var(--radius-md) var(--radius-md)",
         }}
       >
         <SyntaxHighlighter
