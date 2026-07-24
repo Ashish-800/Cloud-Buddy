@@ -9,77 +9,55 @@ import {
   GitGraph,
   ChevronRight,
   StopCircle,
-  ArrowLeft,
+  ShieldCheck,
+  BrainCircuit,
+  Maximize2,
+  RefreshCw,
 } from "lucide-react";
 
 import Navbar, { type ConnectionStatus } from "@/components/Navbar";
-import UploadDropzone from "@/components/UploadDropzone";
+import WorkspaceSidebar from "@/components/WorkspaceSidebar";
+import DraftingBoard from "@/components/DraftingBoard";
 import ComplianceUploader from "@/components/ComplianceUploader";
-import ProviderSelector, { type CloudProvider } from "@/components/ProviderSelector";
 import CritiqueViewer from "@/components/CritiqueViewer";
 import DiagramCanvas from "@/components/DiagramCanvas";
 import CodeExporter from "@/components/CodeExporter";
+import AIReasoningPanel from "@/components/AIReasoningPanel";
+import ArchitectureMentorChat from "@/components/ArchitectureMentorChat";
+import CommandPalette from "@/components/CommandPalette";
+import SessionHistoryDrawer from "@/components/SessionHistoryDrawer";
+import { type CloudProvider } from "@/components/ProviderSelector";
 import { useCloudCanvasStream } from "@/hooks/useCloudCanvasStream";
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
-type TabId = "critique" | "diagram" | "terraform";
-
-interface TabMeta {
-  id: TabId;
-  label: string;
-  icon: React.ReactNode;
-  hasData: boolean;
-}
-
-/* ── Page Component ───────────────────────────────────────────────────── */
+type RightTabId = "critique" | "terraform" | "compliance";
 
 export default function WorkbenchPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [complianceFile, setComplianceFile] = useState<File | null>(null);
   const [provider, setProvider] = useState<CloudProvider>("AWS");
-  const [activeTab, setActiveTab] = useState<TabId>("critique");
+  const [activeRightTab, setActiveRightTab] = useState<RightTabId>("critique");
+
+  // Modals / Drawers state
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const stream = useCloudCanvasStream();
 
-  /* ── Connection Status ────────────────────────────────────────── */
+  // Connection status derivation
   const connectionStatus: ConnectionStatus = stream.isStreaming
     ? "processing"
     : stream.error
-      ? "error"
-      : stream.isComplete
-        ? "active"
-        : "idle";
+    ? "error"
+    : stream.isComplete
+    ? "active"
+    : "idle";
 
   const hasResults =
     stream.critiqueText !== null ||
     stream.mermaidCode !== null ||
     stream.terraformCode !== null;
 
-  /* ── Tab Configuration ────────────────────────────────────────── */
-  const tabs: TabMeta[] = [
-    {
-      id: "critique",
-      label: "Architectural Critique",
-      icon: <MessageSquareWarning size={15} />,
-      hasData: stream.critiqueText !== null,
-    },
-    {
-      id: "diagram",
-      label: "Interactive Diagram",
-      icon: <GitGraph size={15} />,
-      hasData: stream.mermaidCode !== null,
-    },
-    {
-      id: "terraform",
-      label: "Terraform Code",
-      icon: <FileCode2 size={15} />,
-      hasData: stream.terraformCode !== null,
-    },
-  ];
-
-  /* ── Handlers ───────────────────────────────────────────────────── */
-
+  // Analysis Handlers
   const handleAnalyze = useCallback(async () => {
     if (!imageFile) return;
     await stream.startAnalysis(imageFile, complianceFile, provider);
@@ -89,383 +67,371 @@ export default function WorkbenchPage() {
     stream.abort();
   }, [stream]);
 
-  /* ── Tab Content Renderer ───────────────────────────────────────── */
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "critique":
-        return (
-          <CritiqueViewer
-            markdown={stream.critiqueText}
-            isLoading={stream.isStreaming && !stream.critiqueText}
-          />
-        );
-      case "diagram":
-        return (
-          <DiagramCanvas
-            mermaidCode={stream.mermaidCode}
-            isLoading={stream.isStreaming && !stream.mermaidCode}
-          />
-        );
-      case "terraform":
-        return (
-          <CodeExporter
-            code={stream.terraformCode}
-            isLoading={stream.isStreaming && !stream.terraformCode}
-          />
-        );
+  const handleCommandAction = (actionId: string) => {
+    switch (actionId) {
+      case "analyze":
+        if (imageFile) handleAnalyze();
+        break;
+      case "export_tf":
+        setActiveRightTab("terraform");
+        break;
+      case "history":
+        setIsHistoryOpen(true);
+        break;
+      case "aws":
+        setProvider("AWS");
+        break;
+      case "gcp":
+        setProvider("GCP");
+        break;
+      case "azure":
+        setProvider("Azure");
+        break;
     }
   };
 
-  /* ── Main Render ───────────────────────────────────────────────── */
-
   return (
-    <div className="workbench-shell" style={{ display: "flex", flexDirection: "column" }}>
-      {/* Navbar with Gemma 4 Badge & Live Status */}
-      <Navbar status={connectionStatus} modelName="gemma-4-31b-it" />
+    <div
+      style={{
+        display: "flex",
+        width: "100vw",
+        height: "100vh",
+        background: "var(--bg-dark)",
+        color: "var(--text-primary)",
+        overflow: "hidden",
+      }}
+    >
+      {/* ── 1. LEFT SIDEBAR: Compact Blueprint Navigation Rail ───────── */}
+      <WorkspaceSidebar
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+      />
 
-      {/* ── 2-Column Split Workbench Layout ─────────────────────────── */}
-      <main
+      {/* ── MAIN CONTENT AREA ─────────────────────────────────────────── */}
+      <div
         style={{
           flex: 1,
-          display: "grid",
-          gridTemplateColumns: "minmax(340px, 420px) 1fr",
-          gap: "20px",
-          padding: "20px",
-          maxWidth: "1680px",
-          width: "100%",
-          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          height: "100vh",
+          overflow: "hidden",
         }}
       >
-        {/* ── LEFT PANEL: Workspace Input ─────────────────────────── */}
-        <motion.aside
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="glass-panel"
+        {/* ── 2. TOP HEADER ───────────────────────────────────────────── */}
+        <Navbar
+          status={connectionStatus}
+          modelName="gemma-4-31b-it"
+          provider={provider}
+          onProviderSelect={setProvider}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          onOpenHistory={() => setIsHistoryOpen(true)}
+        />
+
+        {/* ── 3. WORKSPACE 2-COLUMN MAIN CANVAS & INTELLIGENCE SPLIT ──── */}
+        <main
           style={{
-            padding: "24px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-            height: "fit-content",
-            position: "sticky",
-            top: "84px",
-          }}
-        >
-          {/* Back to landing */}
-          <a
-            href="/"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              fontSize: "0.75rem",
-              color: "#64748b",
-              textDecoration: "none",
-              fontFamily: "var(--font-mono)",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#818cf8")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#64748b")}
-          >
-            <ArrowLeft size={12} /> Back to Cloud Buddy
-          </a>
-
-          {/* Header */}
-          <div>
-            <h2
-              style={{
-                fontSize: "1rem",
-                fontWeight: 700,
-                color: "#f8fafc",
-                margin: "0 0 4px",
-              }}
-            >
-              Workspace Input
-            </h2>
-            <p style={{ fontSize: "0.8125rem", color: "#64748b", margin: 0 }}>
-              Upload architecture sketch & security guidelines
-            </p>
-          </div>
-
-          <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
-
-          {/* 1. Drag & Drop Sketch Upload Zone */}
-          <UploadDropzone
-            onFileSelect={setImageFile}
-            selectedFile={imageFile}
-            disabled={stream.isStreaming}
-          />
-
-          {/* 2. Optional Compliance / Security Policy Uploader */}
-          <ComplianceUploader
-            onFileSelect={setComplianceFile}
-            selectedFile={complianceFile}
-            disabled={stream.isStreaming}
-          />
-
-          {/* 3. Cloud Provider Segmented Pill Control */}
-          <ProviderSelector
-            selected={provider}
-            onSelect={setProvider}
-            disabled={stream.isStreaming}
-          />
-
-          <div style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
-
-          {/* 4. Trigger / Abort Button */}
-          {stream.isStreaming ? (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleAbort}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                width: "100%",
-                padding: "14px 28px",
-                borderRadius: "var(--radius-md)",
-                fontSize: "0.9375rem",
-                fontWeight: 700,
-                color: "#ffffff",
-                background: "linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)",
-                border: "none",
-                cursor: "pointer",
-                boxShadow: "0 0 20px rgba(244, 63, 94, 0.4)",
-              }}
-            >
-              <StopCircle size={18} />
-              Stop Analysis
-            </motion.button>
-          ) : (
-            <motion.button
-              whileHover={imageFile ? { scale: 1.02 } : undefined}
-              whileTap={imageFile ? { scale: 0.98 } : undefined}
-              className="btn-analyze"
-              disabled={!imageFile}
-              onClick={handleAnalyze}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                width: "100%",
-              }}
-            >
-              <Sparkles size={18} />
-              Analyze System Design
-              <ChevronRight size={16} style={{ opacity: 0.7 }} />
-            </motion.button>
-          )}
-
-          {/* Error Banner */}
-          <AnimatePresence>
-            {stream.error && (
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                style={{
-                  padding: "12px 14px",
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid rgba(244, 63, 94, 0.4)",
-                  background: "rgba(244, 63, 94, 0.1)",
-                  fontSize: "0.8125rem",
-                  color: "#f43f5e",
-                  lineHeight: 1.5,
-                }}
-              >
-                {stream.error}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Active Model Context */}
-          <AnimatePresence>
-            {stream.activeModel && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontSize: "0.75rem",
-                  color: "#64748b",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                <span className="status-dot status-dot--active" />
-                {stream.activeModel} · {stream.activeProvider}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.aside>
-
-        {/* ── RIGHT PANEL: Live Intelligence Dashboard ────────────── */}
-        <motion.section
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="glass-panel"
-          style={{
-            padding: 0,
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "calc(100vh - 120px)",
+            flex: 1,
+            display: "grid",
+            gridTemplateColumns: "1fr 420px",
+            gap: "16px",
+            padding: "16px",
             overflow: "hidden",
+            background: "var(--navy-deep)",
           }}
         >
-          {/* Tab Navigation Bar */}
-          <div
+          {/* ── CENTER WORKSPACE: Interactive Drafting Board & Diagram Canvas ── */}
+          <section
             style={{
               display: "flex",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-              padding: "0 12px",
-              background: "rgba(15,23,42,0.5)",
+              flexDirection: "column",
+              gap: "16px",
+              minWidth: 0,
+              height: "100%",
+              overflowY: "auto",
             }}
           >
-            {tabs.map((tab) => {
-              const isActive = tab.id === activeTab;
-              return (
+            {/* Interactive Upload Drafting Board */}
+            <DraftingBoard
+              onFileSelect={setImageFile}
+              selectedFile={imageFile}
+              isStreaming={stream.isStreaming}
+            />
+
+            {/* Analysis Trigger Control Bar */}
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                alignItems: "center",
+                background: "var(--navy)",
+                border: "1px solid var(--grid)",
+                borderRadius: "var(--radius-md)",
+                padding: "12px 16px",
+              }}
+            >
+              {stream.isStreaming ? (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  type="button"
+                  onClick={handleAbort}
                   style={{
-                    position: "relative",
+                    flex: 1,
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
                     gap: "8px",
-                    padding: "16px 20px",
+                    padding: "12px",
+                    background: "rgba(232, 90, 90, 0.15)",
+                    border: "1px solid var(--accent-rose)",
+                    borderRadius: "var(--radius-sm)",
+                    color: "var(--accent-rose)",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "0.875rem",
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? "#818cf8" : "#64748b",
-                    background: "transparent",
-                    border: "none",
+                    fontWeight: 700,
                     cursor: "pointer",
-                    transition: "color 0.2s ease",
                   }}
                 >
-                  {tab.icon}
-                  {tab.label}
-
-                  {tab.hasData && (
-                    <span
-                      style={{
-                        width: 6, height: 6, borderRadius: "50%",
-                        background: "#10b981",
-                        boxShadow: "0 0 10px rgba(16,185,129,0.6)",
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-
-                  {isActive && (
-                    <motion.div
-                      layoutId="active-tab-glow"
-                      style={{
-                        position: "absolute",
-                        bottom: 0, left: 0, right: 0, height: 2,
-                        background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
-                        borderRadius: "2px 2px 0 0",
-                        boxShadow: "0 0 12px rgba(99,102,241,0.8)",
-                      }}
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
+                  <StopCircle size={16} /> Stop Gemma 4 Analysis
                 </button>
-              );
-            })}
-
-            {stream.detectedComponents.length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", marginLeft: "auto", paddingRight: 16 }}>
-                <span
+              ) : (
+                <button
+                  type="button"
+                  disabled={!imageFile}
+                  onClick={handleAnalyze}
                   style={{
-                    fontSize: "0.75rem", color: "#818cf8",
-                    fontFamily: "var(--font-mono)", padding: "3px 10px",
-                    borderRadius: 12, background: "rgba(99,102,241,0.12)",
-                    border: "1px solid rgba(99,102,241,0.25)",
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    padding: "12px",
+                    background: imageFile ? "var(--marker)" : "rgba(29, 78, 122, 0.4)",
+                    border: "none",
+                    borderRadius: "var(--radius-sm)",
+                    color: imageFile ? "var(--navy-deep)" : "var(--text-muted)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.875rem",
+                    fontWeight: 700,
+                    cursor: imageFile ? "pointer" : "not-allowed",
+                    boxShadow: imageFile ? "var(--glow-marker)" : "none",
+                    transition: "all 0.15s ease",
                   }}
                 >
-                  {stream.detectedComponents.length} components detected
-                </span>
-              </div>
-            )}
-          </div>
+                  <Sparkles size={16} />
+                  Analyze Architecture & Stream Code
+                  <ChevronRight size={16} />
+                </button>
+              )}
+            </div>
 
-          {/* Tab Content Display */}
-          <div style={{ flex: 1, overflow: "auto" }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
+            {/* Error Notification */}
+            <AnimatePresence>
+              {stream.error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--accent-rose)",
+                    background: "rgba(232, 90, 90, 0.12)",
+                    fontSize: "0.8125rem",
+                    color: "var(--accent-rose)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {stream.error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Diagram Canvas Container */}
+            <div
+              style={{
+                flex: 1,
+                minHeight: "360px",
+                background: "var(--navy)",
+                border: "1px solid var(--grid)",
+                borderRadius: "var(--radius-lg)",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <div
                 style={{
-                  height: "100%",
-                  ...(activeTab !== "diagram" ? { padding: "24px" } : {}),
+                  padding: "10px 16px",
+                  background: "var(--navy-deep)",
+                  borderBottom: "1px solid var(--grid)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                {!hasResults && !stream.isStreaming ? (
-                  <div
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <GitGraph size={16} color="var(--marker)" />
+                  <span
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "100px 24px",
-                      textAlign: "center",
-                      gap: "16px",
+                      fontFamily: "var(--font-display)",
+                      fontSize: "0.875rem",
+                      fontWeight: 700,
+                      color: "var(--white-line)",
                     }}
                   >
-                    <div
+                    Interactive Architecture Canvas (Mermaid / CAD)
+                  </span>
+                </div>
+
+                {stream.detectedComponents.length > 0 && (
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "0.6875rem",
+                      color: "var(--marker)",
+                      padding: "2px 8px",
+                      borderRadius: "10px",
+                      background: "rgba(232, 135, 30, 0.12)",
+                      border: "1px solid var(--grid)",
+                    }}
+                  >
+                    {stream.detectedComponents.length} Nodes Identified
+                  </span>
+                )}
+              </div>
+
+              <div style={{ flex: 1, position: "relative" }}>
+                <DiagramCanvas
+                  mermaidCode={stream.mermaidCode}
+                  isLoading={stream.isStreaming && !stream.mermaidCode}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* ── RIGHT COLUMN: AI Intelligence, Critique & Terraform IDE ───── */}
+          <section
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              height: "100%",
+              overflowY: "auto",
+            }}
+          >
+            {/* AI Intelligence Scores & Reasoning Feed */}
+            <AIReasoningPanel
+              isStreaming={stream.isStreaming}
+              critiqueData={stream.critiqueData}
+              detectedComponents={stream.detectedComponents}
+              activeModel={stream.activeModel}
+              activeProvider={stream.activeProvider}
+            />
+
+            {/* Right Tabbed Inspector Header */}
+            <div
+              style={{
+                background: "var(--navy)",
+                border: "1px solid var(--grid)",
+                borderRadius: "var(--radius-lg)",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                minHeight: "380px",
+              }}
+            >
+              {/* Tab Navigation */}
+              <div
+                style={{
+                  display: "flex",
+                  borderBottom: "1px solid var(--grid)",
+                  background: "var(--navy-deep)",
+                }}
+              >
+                {[
+                  { id: "critique", label: "Critique", icon: MessageSquareWarning },
+                  { id: "terraform", label: "Terraform IDE", icon: FileCode2 },
+                  { id: "compliance", label: "Compliance", icon: ShieldCheck },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeRightTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveRightTab(tab.id as RightTabId)}
                       style={{
-                        width: 64, height: 64,
-                        borderRadius: "var(--radius-lg)",
-                        background: "rgba(99,102,241,0.1)",
-                        border: "1px solid rgba(99,102,241,0.2)",
-                        boxShadow: "0 0 30px rgba(99,102,241,0.15)",
+                        flex: 1,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        gap: "6px",
+                        padding: "12px 8px",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.75rem",
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? "var(--marker)" : "var(--text-muted)",
+                        background: isActive ? "var(--navy)" : "transparent",
+                        border: "none",
+                        borderBottom: isActive ? "2px solid var(--marker)" : "2px solid transparent",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
                       }}
                     >
-                      <Sparkles size={28} color="#818cf8" />
-                    </div>
-                    <h3 style={{ fontSize: "1.125rem", fontWeight: 600, color: "#f8fafc", margin: 0 }}>
-                      Live Intelligence Dashboard
-                    </h3>
-                    <p style={{ fontSize: "0.875rem", color: "#64748b", margin: 0, maxWidth: 400, lineHeight: 1.6 }}>
-                      Upload an architecture sketch and click{" "}
-                      <strong style={{ color: "#818cf8" }}>Analyze System Design</strong>{" "}
-                      to watch Gemma 4 produce real-time critiques, Mermaid diagrams, and Terraform code.
-                    </p>
-                  </div>
-                ) : (
-                  renderTabContent()
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </motion.section>
-      </main>
+                      <Icon size={14} color={isActive ? "var(--marker)" : "var(--text-muted)"} />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
 
-      {/* Responsive Breakpoint Override */}
-      <style>{`
-        @media (max-width: 960px) {
-          main {
-            grid-template-columns: 1fr !important;
-          }
-          aside {
-            position: static !important;
-          }
-        }
-      `}</style>
+              {/* Tab Content Display */}
+              <div style={{ flex: 1, overflowY: "auto", position: "relative" }}>
+                {activeRightTab === "critique" && (
+                  <CritiqueViewer
+                    markdown={stream.critiqueText}
+                    isLoading={stream.isStreaming && !stream.critiqueText}
+                  />
+                )}
+
+                {activeRightTab === "terraform" && (
+                  <CodeExporter
+                    code={stream.terraformCode}
+                    isLoading={stream.isStreaming && !stream.terraformCode}
+                  />
+                )}
+
+                {activeRightTab === "compliance" && (
+                  <div style={{ padding: "16px" }}>
+                    <ComplianceUploader
+                      onFileSelect={setComplianceFile}
+                      selectedFile={complianceFile}
+                      disabled={stream.isStreaming}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      {/* ── MODALS & FLOATING CONTROLS ───────────────────────────────── */}
+      <ArchitectureMentorChat
+        activeProvider={provider}
+        score={stream.critiqueData?.score ?? null}
+      />
+
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectAction={handleCommandAction}
+      />
+
+      <SessionHistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+      />
     </div>
   );
 }

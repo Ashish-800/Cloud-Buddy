@@ -1,140 +1,104 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Download, FileCode2 } from "lucide-react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-
-/* ── Types ────────────────────────────────────────────────────────────── */
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  FileCode,
+  Copy,
+  Check,
+  Download,
+  Terminal,
+  Sparkles,
+  Layers,
+  Info,
+} from "lucide-react";
 
 interface CodeExporterProps {
-  /** Terraform HCL code to display. Null = empty state. */
   code: string | null;
-  /** Show loading skeleton. */
   isLoading?: boolean;
 }
 
-/* ── Toast Component ──────────────────────────────────────────────────── */
+type FileTab = "main.tf" | "variables.tf" | "outputs.tf" | "providers.tf";
 
-const CopyToast: React.FC<{ visible: boolean }> = ({ visible }) => (
-  <AnimatePresence>
-    {visible && (
-      <motion.div
-        initial={{ opacity: 0, y: 8, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -8, scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        style={{
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          zIndex: 100,
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "10px 16px",
-          borderRadius: "var(--radius-md)",
-          background: "rgba(34, 197, 94, 0.12)",
-          border: "1px solid rgba(34, 197, 94, 0.25)",
-          backdropFilter: "blur(12px)",
-          color: "#22c55e",
-          fontSize: "0.8125rem",
-          fontWeight: 600,
-          boxShadow: "0 2px 8px rgba(34, 197, 94, 0.2)",
-        }}
-      >
-        <Check size={15} />
-        Copied to clipboard!
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+export default function CodeExporter({ code, isLoading = false }: CodeExporterProps) {
+  const [activeTab, setActiveTab] = useState<FileTab>("main.tf");
+  const [copied, setCopied] = useState(false);
 
-/* ── Loading Skeleton ─────────────────────────────────────────────────── */
-
-const CodeSkeleton: React.FC = () => (
-  <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-    {Array.from({ length: 15 }).map((_, i) => (
-      <motion.div
-        key={i}
-        animate={{ opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.07 }}
-        style={{
-          height: 14,
-          width: `${30 + Math.random() * 60}%`,
-          marginLeft: i % 3 !== 0 ? (i % 5 === 0 ? 48 : 24) : 0,
-          borderRadius: 4,
-          background: "var(--outline-variant)",
-        }}
-      />
-    ))}
-  </div>
-);
-
-/* ── Custom Syntax Theme Override ─────────────────────────────────────── */
-
-const customStyle: Record<string, React.CSSProperties> = {
-  ...vscDarkPlus,
-  'code[class*="language-"]': {
-    ...(vscDarkPlus['code[class*="language-"]'] as React.CSSProperties),
-    fontFamily: "var(--font-mono), 'JetBrains Mono', 'Fira Code', monospace",
-    fontSize: "0.8125rem",
-    lineHeight: "1.7",
-  },
-  'pre[class*="language-"]': {
-    ...(vscDarkPlus['pre[class*="language-"]'] as React.CSSProperties),
-    background: "#1e2631",
-    margin: 0,
-    padding: "20px",
-    borderRadius: 0,
-  },
-};
-
-/* ── Component ────────────────────────────────────────────────────────── */
-
-const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) => {
-  const [showToast, setShowToast] = useState(false);
-
-  /* ── Copy to Clipboard ─────────────────────────────────────────── */
-
-  const handleCopy = useCallback(async () => {
-    if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-    } catch {
-      // Fallback
-      const textarea = document.createElement("textarea");
-      textarea.value = code;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
+  // Sample file partitioning for IDE look
+  const getFileContent = (tab: FileTab) => {
+    if (!code) return "";
+    switch (tab) {
+      case "main.tf":
+        return code;
+      case "variables.tf":
+        return `# variables.tf – Input variables for Cloud Buddy architecture\n\nvariable "aws_region" {\n  type        = string\n  default     = "us-east-1"\n  description = "Target AWS deployment region"\n}\n\nvariable "environment" {\n  type        = string\n  default     = "production"\n  description = "Environment tier tag"\n}\n`;
+      case "outputs.tf":
+        return `# outputs.tf – Exported infrastructure parameters\n\noutput "vpc_id" {\n  value       = aws_vpc.main.id\n  description = "ID of the provisioned VPC"\n}\n\noutput "alb_dns_name" {\n  value       = aws_lb.alb.dns_name\n  description = "Public DNS endpoint for Application Load Balancer"\n}\n`;
+      case "providers.tf":
+        return `# providers.tf – Provider requirements\n\nterraform {\n  required_version = ">= 1.5.0"\n  required_providers {\n    aws = {\n      source  = "hashicorp/aws"\n      version = "~> 5.0"\n    }\n  }\n}\n\nprovider "aws" {\n  region = var.aws_region\n}\n`;
     }
-  }, [code]);
+  };
 
-  /* ── Download as .tf File ──────────────────────────────────────── */
+  const currentContent = getFileContent(activeTab);
 
-  const handleDownload = useCallback(() => {
-    if (!code) return;
-    const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+  const handleCopy = () => {
+    if (!currentContent) return;
+    navigator.clipboard.writeText(currentContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    if (!currentContent) return;
+    const blob = new Blob([currentContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "main.tf";
+    a.download = activeTab;
     a.click();
     URL.revokeObjectURL(url);
-  }, [code]);
+  };
 
-  /* ── Render ────────────────────────────────────────────────────── */
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          padding: "24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          color: "var(--text-muted)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.8125rem",
+            color: "var(--marker)",
+          }}
+        >
+          <Terminal size={16} /> Streaming Production-Ready HCL Terraform Code...
+        </div>
 
-  if (isLoading) return <CodeSkeleton />;
+        <div
+          style={{
+            background: "var(--navy-deep)",
+            border: "1px solid var(--grid)",
+            borderRadius: "var(--radius-md)",
+            padding: "20px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.75rem",
+          }}
+        >
+          <div style={{ color: "var(--text-muted)" }}># Synthesizing HCL provider definitions...</div>
+          <div style={{ color: "var(--marker)" }}>resource &quot;aws_vpc&quot; &quot;main&quot; &#123; ... &#125;</div>
+        </div>
+      </div>
+    );
+  }
 
   if (!code) {
     return (
@@ -144,172 +108,193 @@ const CodeExporter: React.FC<CodeExporterProps> = ({ code, isLoading = false }) 
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "60px 24px",
+          padding: "60px 20px",
           textAlign: "center",
-          gap: "12px",
+          color: "var(--text-muted)",
         }}
       >
-        <div
+        <FileCode size={36} color="var(--grid)" style={{ marginBottom: "12px" }} />
+        <h4
           style={{
-            width: 48,
-            height: 48,
-            borderRadius: "var(--radius-md)",
-            background: "rgba(0, 98, 160, 0.06)",
-            border: "1px solid var(--outline-variant)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            fontFamily: "var(--font-display)",
+            fontSize: "1rem",
+            color: "var(--text-secondary)",
+            margin: "0 0 6px",
           }}
         >
-          <FileCode2 size={20} color="var(--on-surface-variant)" />
-        </div>
-        <p style={{ fontSize: "0.875rem", color: "var(--on-surface-variant)", margin: 0 }}>
-          Terraform code will appear here after analysis.
+          No Terraform Generated Yet
+        </h4>
+        <p style={{ fontSize: "0.8125rem", margin: 0, maxWidth: "340px" }}>
+          Run architecture analysis on your sketch to generate fully commented Terraform code.
         </p>
       </div>
     );
   }
 
+  const lines = currentContent.split("\n");
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      style={{ display: "flex", flexDirection: "column", height: "100%" }}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        background: "var(--navy-deep)",
+        border: "1px solid var(--grid)",
+        borderRadius: "var(--radius-md)",
+        overflow: "hidden",
+      }}
     >
-      {/* ── Toolbar ───────────────────────────────────────────────── */}
+      {/* ── IDE File Tabs Header ────────────────────────────────────── */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
-          padding: "10px 16px",
-          borderBottom: "1px solid var(--outline-variant)",
-          background: "var(--surface-container)",
-          borderRadius: "var(--radius-md) var(--radius-md) 0 0",
+          background: "var(--navy)",
+          borderBottom: "1px solid var(--grid)",
+          padding: "0 8px",
         }}
       >
-        {/* File label */}
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1 }}>
-          <FileCode2 size={14} color="#22c55e" />
-          <span
+        {(["main.tf", "variables.tf", "outputs.tf", "providers.tf"] as FileTab[]).map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "10px 14px",
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.75rem",
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? "var(--marker)" : "var(--text-muted)",
+                background: isActive ? "var(--navy-deep)" : "transparent",
+                border: "none",
+                borderTop: isActive ? "2px solid var(--marker)" : "2px solid transparent",
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <FileCode size={13} color={isActive ? "var(--marker)" : "var(--text-muted)"} />
+              {tab}
+            </button>
+          );
+        })}
+
+        {/* Action Controls */}
+        <div style={{ marginLeft: "auto", display: "flex", gap: "8px", paddingRight: "8px" }}>
+          <button
+            onClick={handleCopy}
             style={{
-              fontSize: "0.75rem",
-              fontWeight: 600,
-              color: "var(--on-surface-variant)",
-              fontFamily: "var(--font-mono), monospace",
-            }}
-          >
-            main.tf
-          </span>
-          <span
-            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              padding: "4px 10px",
+              background: "rgba(29, 78, 122, 0.4)",
+              border: "1px solid var(--grid)",
+              borderRadius: "var(--radius-sm)",
               fontSize: "0.6875rem",
-              color: "var(--on-surface-variant)",
-              fontFamily: "var(--font-mono), monospace",
+              fontFamily: "var(--font-mono)",
+              color: "var(--white-line)",
+              cursor: "pointer",
             }}
           >
-            · {code.split("\n").length} lines
-          </span>
+            {copied ? <Check size={12} color="var(--accent-emerald)" /> : <Copy size={12} />}
+            {copied ? "Copied!" : "Copy"}
+          </button>
+
+          <button
+            onClick={handleDownload}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              padding: "4px 10px",
+              background: "var(--marker)",
+              border: "none",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.6875rem",
+              fontFamily: "var(--font-mono)",
+              fontWeight: 700,
+              color: "var(--navy-deep)",
+              cursor: "pointer",
+            }}
+          >
+            <Download size={12} /> Download
+          </button>
         </div>
-
-        {/* Copy Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleCopy}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "6px 12px",
-            borderRadius: "var(--radius-sm)",
-            border: "1px solid var(--glass-border)",
-            background: "transparent",
-            color: "var(--text-secondary)",
-            fontSize: "0.6875rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "border-color 0.2s, background 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--primary-container)";
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 153, 0, 0.06)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--glass-border)";
-            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-          }}
-        >
-          <Copy size={13} />
-          Copy Code
-        </motion.button>
-
-        {/* Download Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleDownload}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "6px 12px",
-            borderRadius: "var(--radius-sm)",
-            border: "1px solid var(--glass-border)",
-            background: "transparent",
-            color: "var(--text-secondary)",
-            fontSize: "0.6875rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "border-color 0.2s, background 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "#22c55e";
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(34, 197, 94, 0.06)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--glass-border)";
-            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-          }}
-        >
-          <Download size={13} />
-          Download main.tf
-        </motion.button>
       </div>
 
-      {/* ── Code Block ────────────────────────────────────────────── */}
+      {/* ── IDE Code Display with Line Numbers ───────────────────────── */}
       <div
         style={{
           flex: 1,
           overflow: "auto",
-          borderRadius: "0 0 var(--radius-md) var(--radius-md)",
+          padding: "16px 0",
+          fontFamily: "var(--font-mono)",
+          fontSize: "0.8125rem",
+          lineHeight: 1.6,
+          display: "flex",
         }}
       >
-        <SyntaxHighlighter
-          language="hcl"
-          style={customStyle}
-          showLineNumbers
-          lineNumberStyle={{
-            minWidth: "3em",
-            paddingRight: "16px",
-            color: "var(--text-muted)",
-            opacity: 0.5,
-            fontSize: "0.75rem",
-            fontFamily: "var(--font-mono), monospace",
+        {/* Line Numbers Column */}
+        <div
+          style={{
+            padding: "0 12px",
             userSelect: "none",
+            textAlign: "right",
+            color: "var(--text-muted)",
+            borderRight: "1px solid rgba(29, 78, 122, 0.4)",
+            opacity: 0.6,
           }}
-          wrapLines
-          wrapLongLines
         >
-          {code}
-        </SyntaxHighlighter>
+          {lines.map((_, i) => (
+            <div key={i}>{i + 1}</div>
+          ))}
+        </div>
+
+        {/* Code Content Column */}
+        <div style={{ padding: "0 16px", flex: 1, whiteSpace: "pre", color: "var(--paper)" }}>
+          {lines.map((line, i) => {
+            const isComment = line.trim().startsWith("#");
+            const isResource = line.includes("resource ") || line.includes("provider ");
+            return (
+              <div
+                key={i}
+                style={{
+                  color: isComment
+                    ? "var(--text-muted)"
+                    : isResource
+                    ? "var(--marker)"
+                    : "var(--paper)",
+                }}
+              >
+                {line}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* ── Copy Toast ────────────────────────────────────────────── */}
-      <CopyToast visible={showToast} />
-    </motion.div>
+      {/* ── Footer Info Strip ────────────────────────────────────────── */}
+      <div
+        style={{
+          padding: "6px 14px",
+          background: "var(--navy)",
+          borderTop: "1px solid var(--grid)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontFamily: "var(--font-mono)",
+          fontSize: "0.625rem",
+          color: "var(--text-muted)",
+        }}
+      >
+        <span>HashiCorp HCL · Terraform v1.5+ Compatible</span>
+        <span>{lines.length} Lines · UTF-8</span>
+      </div>
+    </div>
   );
-};
-
-export default CodeExporter;
+}

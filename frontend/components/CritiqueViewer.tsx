@@ -4,76 +4,90 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion } from "framer-motion";
-import { AlertTriangle, CheckCircle2, Info, AlertCircle, Flame } from "lucide-react";
-
-/* ── Types ────────────────────────────────────────────────────────────── */
+import { AlertTriangle, CheckCircle2, Info, AlertCircle, Flame, ShieldAlert } from "lucide-react";
 
 interface CritiqueViewerProps {
-  /** Markdown string to render. Null = empty state. */
   markdown: string | null;
-  /** Show loading skeleton. */
   isLoading?: boolean;
+  onNodeClick?: (nodeId: string) => void;
 }
 
-/* ── Severity Badge Component ─────────────────────────────────────────── */
-
-const SEVERITY_STYLES: Record<string, { bg: string; border: string; color: string; icon: React.ReactNode }> = {
+const SEVERITY_MAP: Record<string, { bg: string; border: string; color: string; icon: React.ReactNode }> = {
   CRITICAL: {
-    bg: "rgba(239, 68, 68, 0.1)",
-    border: "rgba(239, 68, 68, 0.3)",
-    color: "#f87171",
-    icon: <Flame size={12} />,
+    bg: "rgba(232, 90, 90, 0.15)",
+    border: "var(--accent-rose)",
+    color: "var(--accent-rose)",
+    icon: <Flame size={13} />,
   },
   HIGH: {
-    bg: "rgba(249, 115, 22, 0.1)",
-    border: "rgba(249, 115, 22, 0.3)",
-    color: "#fb923c",
-    icon: <AlertTriangle size={12} />,
+    bg: "rgba(232, 135, 30, 0.15)",
+    border: "var(--marker)",
+    color: "var(--marker)",
+    icon: <AlertTriangle size={13} />,
   },
   MEDIUM: {
-    bg: "rgba(234, 179, 8, 0.1)",
-    border: "rgba(234, 179, 8, 0.3)",
-    color: "#facc15",
-    icon: <AlertCircle size={12} />,
+    bg: "rgba(244, 162, 54, 0.12)",
+    border: "var(--accent-marker-light)",
+    color: "var(--accent-marker-light)",
+    icon: <AlertCircle size={13} />,
   },
   LOW: {
-    bg: "rgba(59, 130, 246, 0.1)",
-    border: "rgba(59, 130, 246, 0.3)",
-    color: "#60a5fa",
-    icon: <Info size={12} />,
+    bg: "rgba(56, 189, 248, 0.12)",
+    border: "var(--accent-blue)",
+    color: "var(--accent-blue)",
+    icon: <Info size={13} />,
   },
   INFO: {
-    bg: "rgba(99, 102, 241, 0.1)",
-    border: "rgba(99, 102, 241, 0.3)",
-    color: "#818cf8",
-    icon: <CheckCircle2 size={12} />,
+    bg: "rgba(76, 175, 125, 0.12)",
+    border: "var(--accent-emerald)",
+    color: "var(--accent-emerald)",
+    icon: <CheckCircle2 size={13} />,
   },
 };
 
-/* ── Loading Skeleton ─────────────────────────────────────────────────── */
-
 const Skeleton: React.FC = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
-    {[100, 85, 92, 60, 78, 45, 88, 70].map((width, i) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: "14px", padding: "12px 0" }}>
+    {[95, 80, 88, 65, 75, 50, 85].map((width, i) => (
       <motion.div
         key={i}
-        animate={{ opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+        animate={{ opacity: [0.3, 0.7, 0.3] }}
+        transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.1 }}
         style={{
-          height: i === 0 ? 28 : 14,
+          height: i === 0 ? "24px" : "16px",
           width: `${width}%`,
-          borderRadius: 6,
-          background: "var(--outline-variant)",
+          borderRadius: "var(--radius-sm)",
+          background: "rgba(29, 78, 122, 0.4)",
         }}
       />
     ))}
   </div>
 );
 
-/* ── Component ────────────────────────────────────────────────────────── */
-
-const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = false }) => {
-  if (isLoading) return <Skeleton />;
+export default function CritiqueViewer({
+  markdown,
+  isLoading = false,
+  onNodeClick,
+}: CritiqueViewerProps) {
+  if (isLoading) {
+    return (
+      <div style={{ padding: "16px" }}>
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.75rem",
+            color: "var(--marker)",
+            marginBottom: "12px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <ShieldAlert size={14} /> Evaluating Architecture against AWS Well-Architected Framework...
+        </div>
+        <Skeleton />
+      </div>
+    );
+  }
 
   if (!markdown) {
     return (
@@ -83,14 +97,24 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "60px 24px",
+          padding: "60px 20px",
           textAlign: "center",
-          gap: "12px",
+          color: "var(--text-muted)",
         }}
       >
-        <AlertTriangle size={32} color="var(--text-muted)" strokeWidth={1.5} />
-        <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", margin: 0 }}>
-          No critique data available yet.
+        <ShieldAlert size={36} color="var(--grid)" style={{ marginBottom: "12px" }} />
+        <h4
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "1rem",
+            color: "var(--text-secondary)",
+            margin: "0 0 6px",
+          }}
+        >
+          No Critique Available
+        </h4>
+        <p style={{ fontSize: "0.8125rem", margin: 0, maxWidth: "340px" }}>
+          Upload an architecture sketch and run analysis to receive structured architectural findings.
         </p>
       </div>
     );
@@ -98,208 +122,167 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="critique-viewer"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{
+        padding: "16px",
+        color: "var(--text-primary)",
+        lineHeight: 1.6,
+      }}
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          /* ── Headings ─────────────────────────────────────────── */
           h2: ({ children }) => (
             <h2
               style={{
-                fontSize: "1.25rem",
+                fontFamily: "var(--font-display)",
+                fontSize: "1.125rem",
                 fontWeight: 700,
-                color: "var(--text-primary)",
-                marginTop: 0,
-                marginBottom: "16px",
-                paddingBottom: "12px",
-                borderBottom: "1px solid var(--glass-border)",
-                letterSpacing: "-0.01em",
+                color: "var(--white-line)",
+                borderBottom: "1px solid var(--grid)",
+                paddingBottom: "8px",
+                marginTop: "20px",
+                marginBottom: "12px",
               }}
             >
               {children}
             </h2>
           ),
-
           h3: ({ children }) => (
             <h3
               style={{
-                fontSize: "1rem",
-                fontWeight: 700,
-                color: "var(--text-primary)",
-                margin: "24px 0 12px",
-                letterSpacing: "-0.01em",
+                fontFamily: "var(--font-display)",
+                fontSize: "0.9375rem",
+                fontWeight: 600,
+                color: "var(--marker)",
+                marginTop: "16px",
+                marginBottom: "8px",
               }}
             >
               {children}
             </h3>
           ),
+          h4: ({ children }) => {
+            const text = String(children);
+            let sevKey = "INFO";
+            if (text.includes("CRITICAL")) sevKey = "CRITICAL";
+            else if (text.includes("HIGH")) sevKey = "HIGH";
+            else if (text.includes("MEDIUM")) sevKey = "MEDIUM";
+            else if (text.includes("LOW")) sevKey = "LOW";
 
-          h4: ({ children }) => (
-            <h4
-              style={{
-                fontSize: "0.9375rem",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-                margin: "20px 0 8px",
-              }}
-            >
-              {children}
-            </h4>
-          ),
+            const style = SEVERITY_MAP[sevKey] || SEVERITY_MAP.INFO;
 
-          /* ── Paragraphs ───────────────────────────────────────── */
-          p: ({ children }) => (
-            <p
-              style={{
-                fontSize: "0.875rem",
-                lineHeight: 1.75,
-                color: "var(--text-secondary)",
-                margin: "0 0 12px",
-              }}
-            >
-              {children}
-            </p>
-          ),
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: style.bg,
+                  border: `1px solid ${style.border}`,
+                  padding: "8px 12px",
+                  borderRadius: "var(--radius-sm)",
+                  marginTop: "16px",
+                  marginBottom: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.875rem",
+                    fontWeight: 700,
+                    color: "var(--white-line)",
+                  }}
+                >
+                  {children}
+                </div>
 
-          /* ── Blockquotes (Recommendations) ────────────────────── */
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.625rem",
+                    fontWeight: 700,
+                    color: style.color,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {style.icon} {sevKey}
+                </span>
+              </div>
+            );
+          },
           blockquote: ({ children }) => (
             <blockquote
               style={{
-                margin: "12px 0 16px",
-                padding: "12px 16px",
-                borderLeft: "3px solid var(--primary-container)",
+                background: "rgba(232, 135, 30, 0.08)",
+                borderLeft: "3px solid var(--marker)",
+                padding: "10px 14px",
                 borderRadius: "0 var(--radius-sm) var(--radius-sm) 0",
-                background: "rgba(255, 153, 0, 0.06)",
+                margin: "12px 0",
                 fontSize: "0.8125rem",
-                color: "var(--text-secondary)",
-                lineHeight: 1.7,
+                color: "var(--text-primary)",
               }}
             >
               {children}
             </blockquote>
           ),
-
-          /* ── Inline Code (Severity Badges) ────────────────────── */
-          code: ({ children, className }) => {
-            const text = String(children).trim();
-            const severity = SEVERITY_STYLES[text];
-
-            if (severity && !className) {
-              return (
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    padding: "2px 8px",
-                    borderRadius: "4px",
-                    fontSize: "0.6875rem",
-                    fontWeight: 700,
-                    fontFamily: "var(--font-mono), monospace",
-                    letterSpacing: "0.05em",
-                    background: severity.bg,
-                    border: `1px solid ${severity.border}`,
-                    color: severity.color,
-                    verticalAlign: "middle",
-                  }}
-                >
-                  {severity.icon}
-                  {text}
-                </span>
-              );
-            }
-
-            return (
-              <code
-                style={{
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  fontSize: "0.8125rem",
-                  fontFamily: "var(--font-mono), monospace",
-                  background: "rgba(0, 98, 160, 0.08)",
-                  color: "var(--secondary)",
-                  border: "1px solid rgba(0, 98, 160, 0.15)",
-                }}
-              >
-                {children}
-              </code>
-            );
-          },
-
-          /* ── Tables ───────────────────────────────────────────── */
           table: ({ children }) => (
-            <div style={{ overflowX: "auto", margin: "8px 0 16px" }}>
+            <div style={{ overflowX: "auto", margin: "14px 0" }}>
               <table
                 style={{
                   width: "100%",
                   borderCollapse: "collapse",
                   fontSize: "0.8125rem",
+                  border: "1px solid var(--grid)",
                 }}
               >
                 {children}
               </table>
             </div>
           ),
-
-          thead: ({ children }) => (
-            <thead
-              style={{
-                borderBottom: "2px solid var(--outline-variant)",
-              }}
-            >
-              {children}
-            </thead>
-          ),
-
           th: ({ children }) => (
             <th
               style={{
+                background: "var(--navy-deep)",
                 padding: "8px 12px",
+                borderBottom: "1px solid var(--grid)",
                 textAlign: "left",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                color: "var(--on-surface-variant)",
+                fontFamily: "var(--font-mono)",
+                color: "var(--marker)",
               }}
             >
               {children}
             </th>
           ),
-
           td: ({ children }) => (
             <td
               style={{
                 padding: "8px 12px",
-                borderBottom: "1px solid var(--outline-variant)",
-                color: "var(--on-surface-variant)",
+                borderBottom: "1px solid rgba(29, 78, 122, 0.4)",
+                color: "var(--text-secondary)",
               }}
             >
               {children}
             </td>
           ),
-
-          /* ── Horizontal Rules ─────────────────────────────────── */
-          hr: () => (
-            <hr
+          code: ({ children }) => (
+            <code
               style={{
-                border: "none",
-                height: 1,
-                background: "var(--outline-variant)",
-                margin: "8px 0",
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.75rem",
+                background: "var(--navy-deep)",
+                padding: "2px 6px",
+                borderRadius: "3px",
+                color: "var(--marker)",
+                border: "1px solid var(--grid)",
               }}
-            />
-          ),
-
-          /* ── Strong ───────────────────────────────────────────── */
-          strong: ({ children }) => (
-            <strong style={{ color: "var(--on-surface)", fontWeight: 600 }}>
+            >
               {children}
-            </strong>
+            </code>
           ),
         }}
       >
@@ -307,6 +290,4 @@ const CritiqueViewer: React.FC<CritiqueViewerProps> = ({ markdown, isLoading = f
       </ReactMarkdown>
     </motion.div>
   );
-};
-
-export default CritiqueViewer;
+}
