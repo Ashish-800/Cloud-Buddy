@@ -68,17 +68,24 @@ const Navbar: React.FC<NavbarProps> = ({ status }) => {
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <div
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: "var(--radius-sm)",
-            background: "linear-gradient(135deg, var(--accent-indigo), var(--accent-violet))",
+            width: 40,
+            height: 40,
+            borderRadius: "var(--radius-md)",
+            background: "rgba(255, 255, 255, 0.06)",
+            border: "1px solid var(--glass-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "var(--glow-indigo)",
+            overflow: "hidden",
+            boxShadow: "0 0 12px rgba(56, 189, 248, 0.2)",
           }}
         >
-          <Zap size={18} color="white" strokeWidth={2.5} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-icon.png"
+            alt="Cloud Buddy Logo"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
         </div>
 
         <div>
@@ -92,7 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({ status }) => {
               margin: 0,
             }}
           >
-            CloudBuddy
+            Cloud Buddy
           </h1>
           <p
             style={{
@@ -103,7 +110,7 @@ const Navbar: React.FC<NavbarProps> = ({ status }) => {
               textTransform: "uppercase",
             }}
           >
-            AI System Design Tutor
+            Your Friendly Cloud Companion
           </p>
         </div>
       </div>

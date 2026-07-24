@@ -22,9 +22,12 @@ const jetbrainsMono = JetBrains_Mono({
 /* ── SEO Metadata ────────────────────────────────────────────────────── */
 
 export const metadata: Metadata = {
-  title: "CloudBuddy — AI System Design Tutor",
+  title: "Cloud Buddy — Your Friendly Cloud Companion",
   description:
     "Upload a hand-drawn cloud architecture sketch and get an instant architectural critique, interactive Mermaid diagram, and production-ready Terraform code — powered by Gemma 4 Multimodal.",
+  icons: {
+    icon: "/logo-icon.png",
+  },
   keywords: [
     "cloud architecture",
     "system design",
