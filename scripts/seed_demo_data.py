@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CloudCanvas – Demo Data Seed Script
+CloudBuddy – Demo Data Seed Script
 =====================================
 Generates mock whiteboard architecture sketch images and a sample
 SOC2 compliance policy document for rapid testing without manual uploads.
@@ -347,7 +347,7 @@ def generate_compliance_document():
 # ── Main ──────────────────────────────────────────────────────────────────
 
 def main():
-    print("\n[*] CloudCanvas Demo Data Generator")
+    print("\n[*] CloudBuddy Demo Data Generator")
     print("=" * 42)
     print(f"Output directory: {OUTPUT_DIR.resolve()}\n")
 
@@ -361,7 +361,7 @@ def main():
 
     print(f"\n[OK] All demo data generated in: {OUTPUT_DIR.resolve()}")
     print("\nUsage:")
-    print("  1. Upload any sketch image to CloudCanvas")
+    print("  1. Upload any sketch image to CloudBuddy")
     print("  2. Attach SOC2_Compliance_Rules.txt as the compliance document")
     print("  3. Hit 'Analyze System Design' to see compliance-aware analysis\n")
 

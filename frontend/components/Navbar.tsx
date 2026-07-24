@@ -92,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({ status }) => {
               margin: 0,
             }}
           >
-            CloudCanvas
+            CloudBuddy
           </h1>
           <p
             style={{

@@ -213,7 +213,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ mermaidCode, isLoading = 
         const pngUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = pngUrl;
-        a.download = "cloudcanvas-diagram.png";
+        a.download = "cloudbuddy-diagram.png";
         a.click();
         URL.revokeObjectURL(pngUrl);
       }, "image/png");

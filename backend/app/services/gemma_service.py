@@ -1,5 +1,5 @@
 """
-CloudCanvas – Gemma 4 Multimodal Service (v2 – Enterprise Compliance)
+CloudBuddy – Gemma 4 Multimodal Service (v2 – Enterprise Compliance)
 ======================================================================
 Encapsulates all communication with the Gemma 4 (12B / 4B) model via
 the Google GenAI SDK.  Handles:
@@ -34,7 +34,7 @@ from app.schemas.analysis import (
     SSEEventType,
 )
 
-logger = logging.getLogger("cloudcanvas.gemma_service")
+logger = logging.getLogger("cloudbuddy.gemma_service")
 
 # ── Google GenAI Client (module-level singleton) ──────────────────────────
 
@@ -59,7 +59,7 @@ def _get_client() -> genai.Client:
 # ── Prompt Templates ─────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT_BASE = """\
-You are **CloudCanvas AI**, an elite cloud-architecture reviewer and \
+You are **CloudBuddy AI**, an elite cloud-architecture reviewer and \
 infrastructure-as-code generator.  You receive a hand-drawn (or rough) \
 cloud architecture sketch and optionally a compliance/security policy document.
 

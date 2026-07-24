@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────
-# CloudCanvas – Docker Compose (Development)
+# CloudBuddy – Docker Compose (Development)
 # ──────────────────────────────────────────────────────────────────────
 # Spin up both backend and frontend with a single command:
 #   docker compose up --build
@@ -15,7 +15,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: cloudcanvas-api
+    container_name: cloudbuddy-api
     ports:
       - "8000:8000"
     env_file:
@@ -34,7 +34,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: cloudcanvas-ui
+    container_name: cloudbuddy-ui
     ports:
       - "3000:3000"
     environment:

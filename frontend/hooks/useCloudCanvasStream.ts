@@ -337,7 +337,7 @@ export function useCloudCanvasStream(): UseCloudCanvasStreamReturn {
           return;
         }
         const message =
-          err instanceof Error ? err.message : "Connection to CloudCanvas API failed";
+          err instanceof Error ? err.message : "Connection to CloudBuddy API failed";
         setState((s) => ({
           ...s,
           isStreaming: false,
