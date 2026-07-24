@@ -1,0 +1,243 @@
+/*
+ * CloudCanvas – Global Design System
+ * ====================================
+ * Dark-mode-first, glassmorphic developer aesthetic
+ */
+
+@import "tailwindcss";
+
+/* ── CSS Custom Properties (Design Tokens) ───────────────────────────── */
+
+:root {
+  /* Surface palette */
+  --bg-primary: #090d16;
+  --bg-secondary: #0f1424;
+  --bg-tertiary: #151b2e;
+  --bg-elevated: #1a2138;
+
+  /* Glass surfaces */
+  --glass-bg: rgba(15, 20, 36, 0.65);
+  --glass-border: rgba(99, 115, 175, 0.18);
+  --glass-hover: rgba(99, 115, 175, 0.28);
+
+  /* Accent palette */
+  --accent-indigo: #6366f1;
+  --accent-indigo-light: #818cf8;
+  --accent-violet: #8b5cf6;
+  --accent-cyan: #22d3ee;
+  --accent-emerald: #34d399;
+  --accent-amber: #fbbf24;
+  --accent-rose: #fb7185;
+
+  /* Text */
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Neon glows */
+  --glow-indigo: 0 0 20px rgba(99, 102, 241, 0.35), 0 0 60px rgba(99, 102, 241, 0.1);
+  --glow-cyan: 0 0 20px rgba(34, 211, 238, 0.35), 0 0 60px rgba(34, 211, 238, 0.1);
+  --glow-emerald: 0 0 20px rgba(52, 211, 153, 0.35), 0 0 60px rgba(52, 211, 153, 0.1);
+  --glow-rose: 0 0 15px rgba(251, 113, 133, 0.4);
+
+  /* Sizing */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+/* ── Base Reset ──────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ── Glassmorphism Utility Classes ───────────────────────────────────── */
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+.glass-panel-hover {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel-hover:hover {
+  border-color: var(--glass-hover);
+  box-shadow: var(--glow-indigo);
+}
+
+/* ── Neon Status Indicators ──────────────────────────────────────────── */
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot--active {
+  background: var(--accent-emerald);
+  box-shadow: var(--glow-emerald);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.status-dot--idle {
+  background: var(--text-muted);
+}
+
+.status-dot--error {
+  background: var(--accent-rose);
+  box-shadow: var(--glow-rose);
+}
+
+.status-dot--processing {
+  background: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── Upload Drop Zone ────────────────────────────────────────────────── */
+
+.dropzone {
+  border: 2px dashed var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.dropzone:hover,
+.dropzone--active {
+  border-color: var(--accent-indigo);
+  background: rgba(99, 102, 241, 0.06);
+  box-shadow: var(--glow-indigo);
+}
+
+/* ── Provider Pill Buttons ───────────────────────────────────────────── */
+
+.provider-pill {
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.provider-pill:hover {
+  border-color: var(--glass-hover);
+  color: var(--text-primary);
+}
+
+.provider-pill--selected {
+  border-color: var(--accent-indigo);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-indigo-light);
+  box-shadow: var(--glow-indigo);
+}
+
+/* ── Trigger Button ──────────────────────────────────────────────────── */
+
+.btn-analyze {
+  position: relative;
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: white;
+  background: linear-gradient(135deg, var(--accent-indigo), var(--accent-violet));
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+.btn-analyze:hover:not(:disabled) {
+  box-shadow: var(--glow-indigo);
+  transform: translateY(-1px);
+}
+
+.btn-analyze:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-analyze:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-analyze::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+/* ── Ambient Background Gradient ─────────────────────────────────────── */
+
+.ambient-gradient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 85% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(34, 211, 238, 0.04) 0%, transparent 60%);
+}
