@@ -1,41 +1,62 @@
-# ☁️ CloudBuddy — AI-Powered System Design Tutor
+# ☁️ Cloud Buddy — AI-Powered Cloud Architecture Tutor
 
-> **Upload a hand-drawn cloud architecture sketch → Get an instant architectural critique, interactive Mermaid diagram, and production-ready Terraform code** — powered by Gemma 4 Multimodal.
+> **Upload a hand-drawn cloud architecture sketch → Get real-time AI architectural critique, interactive CAD diagrams, HCL Terraform code, and policy compliance validation** — powered by **Gemma 4 Multimodal** & **Supabase**.
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16-black.svg)](https://nextjs.org)
-[![Gemma 4](https://img.shields.io/badge/Gemma_4-Multimodal-orange.svg)](https://ai.google.dev)
+[![Gemma 4](https://img.shields.io/badge/Gemma_4-31B_Multimodal-orange.svg)](https://ai.google.dev)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)](https://fastapi.tiangolo.com)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16_Turbopack-black.svg)](https://nextjs.org)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_&_Auth-blue.svg)](https://supabase.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 🏗️ Architecture Overview
+## 🌟 Executive Summary
+
+**Cloud Buddy** is a flagship AI Cloud Architecture Studio. Designed for cloud architects, DevOps engineers, and students, Cloud Buddy bridges the gap between rough whiteboard sketches and production-grade cloud deployments. 
+
+Simply upload a whiteboard drawing or CAD diagram: Cloud Buddy utilizes **Google Gemma 4 Multimodal** to analyze your architecture, identify single points of failure, compute security & cost health scores, render interactive diagrams, and stream production-ready **HCL Terraform code**.
+
+---
+
+## 🏗️ System Architecture
 
 ```mermaid
 graph TD
-    subgraph Frontend ["Next.js 16 + TypeScript"]
-        A[Upload Dropzone] --> B[Compliance Uploader]
-        B --> C[Provider Selector]
-        C --> D[useCloudBuddyStream Hook]
-        D --> E[CritiqueViewer]
-        D --> F[DiagramCanvas]
-        D --> G[CodeExporter]
+    subgraph Client ["Next.js 16 (CAD Blueprint Theme)"]
+        UI[Workbench / Progressive Disclosure Canvas]
+        DB[Drafting Board & Sketch Ingestion]
+        DIAG[Interactive Diagram Centerpiece]
+        IDE[Multi-file HCL Terraform IDE]
+        MENTOR[Architecture Mentor AI Assistant]
+        AUTH[Supabase Auth Signup / Login]
     end
 
-    subgraph Backend ["FastAPI + Python 3.11"]
-        H[POST /api/v1/analyze] --> I[Image Validator]
-        I --> J[Compliance Context Injector]
-        J --> K[Gemma 4 Multimodal SDK]
-        K --> L[JSON Parser + Validator]
-        L --> M[SSE Stream Generator]
+    subgraph Backend ["FastAPI Python Backend"]
+        API[POST /api/v1/analyze]
+        VAL[Image & Data Validator]
+        COMP[Compliance Context Injector]
+        GEMMA[Gemma 4 Multimodal Engine]
+        SSE[Server-Sent Events Stream Generator]
     end
 
-    D -- "SSE text/event-stream" --> M
-    A -- "multipart/form-data" --> H
-
-    subgraph AI ["Google AI"]
-        K --> N[Gemma 4 12B / 4B]
+    subgraph Database ["Supabase PostgreSQL + RLS"]
+        PROF[profiles]
+        ANAL[analyses]
+        COMP_NODES[detected_components]
+        TOPICS[knowledge_topics]
+        DEPLOY[deployments]
     end
+
+    subgraph AI ["Google AI Studio"]
+        SDK[Gemma 4 31B Multimodal Vision]
+    end
+
+    UI -- "Upload sketch + policy" --> API
+    API --> VAL --> COMP --> GEMMA
+    GEMMA -- "System Prompt + 128K Context" --> SDK
+    SDK -- "Structured Stream" --> SSE
+    SSE -- "text/event-stream" --> UI
+    UI -- "Sync Session & Scores" --> Database
 ```
 
 ---
@@ -44,152 +65,148 @@ graph TD
 
 | Feature | Description |
 |---------|-------------|
-| 🎨 **Visual Analysis** | Upload whiteboard sketches — Gemma 4 identifies EC2, S3, RDS, VPCs, Load Balancers, and more |
-| 🔍 **Architecture Critique** | Detailed findings with severity levels: single points of failure, security gaps, cost issues |
-| 📊 **Interactive Diagrams** | Live Mermaid.js rendering with zoom, pan, fullscreen, and PNG export |
-| 💻 **Terraform Generation** | Production-ready, fully commented `.tf` code with syntax highlighting |
-| 🛡️ **Compliance Enforcement** | Upload SOC2/HIPAA/PCI-DSS policies — Gemma enforces them as hard constraints |
-| ⚡ **Real-time Streaming** | Server-Sent Events deliver results progressively as they're generated |
-| 🌙 **Glassmorphic Dark UI** | Premium developer IDE aesthetic with Framer Motion animations |
+| 🎨 **Multimodal Vision Analysis** | Upload whiteboard sketches or digital diagrams — Gemma 4 identifies EC2, S3, RDS, VPCs, Load Balancers, IAM roles, and gateways. |
+| ⚡ **SSE Real-Time Streaming** | Server-Sent Events deliver AI reasoning, component detection, and code generation progressively as the AI thinks. |
+| 📐 **Progressive Disclosure UI** | Stage-guided engineering workspace ("Apple meets Figma for Cloud Architects") featuring single-focal-point transitions and 8px grid alignment. |
+| 💻 **HCL Terraform IDE** | Multi-file code editor (`main.tf`, `variables.tf`, `outputs.tf`, `providers.tf`) with line numbers, syntax highlighting, copy, and `.tf` download bundle. |
+| 🛡️ **Compliance Context Engine** | Upload SOC2, HIPAA, PCI-DSS, or ISO 27001 policy PDFs/TXTs — Gemma enforces rules as hard constraints in Terraform. |
+| 🗄️ **Supabase Integration** | PostgreSQL database with Row Level Security (RLS) policies and authentication flow for saved analyses and deployment state. |
+| ⚡ **Global Search & Command Palette** | Instant `Ctrl + K` / `Cmd + K` search modal for fast command execution. |
+| 🤖 **Architecture Mentor AI** | Context-aware AI chat assistant powered by Gemma 4 to answer node-specific security & cost questions. |
+| 🚀 **Deployment & Validation Engine** | Canary deployment visual diff, OPA/Checkov policy validation, and automated IAM conflict checks (`/deploy`). |
+| 📚 **Architectural Knowledge Hub** | Reference tutorials, comparison tables (NACLs vs SGs), and Terraform code patterns (`/knowledge`). |
+
+---
+
+## 🎨 Design Language (Blueprint Theme)
+
+Cloud Buddy uses a custom engineering blueprint design system inspired by Apple, Figma, and mechanical CAD drafting tables:
+
+- **Deep Navy Background**: `#081B36`
+- **Solid Navy Panels**: `#0B2545`
+- **Blueprint Grid Lines**: `#1D4E7A`
+- **Construction Orange Marker**: `#E8871E`
+- **Paper White Text**: `#F2EFE6`
+- **Muted Steel Blue**: `#AFC2D4`
+- **Typography**: `Space Grotesk` (headings), `Inter` (interface), `JetBrains Mono` (HCL code & telemetry).
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 cloud-buddy/
-├── backend/                          # FastAPI Python backend
+├── backend/                              # FastAPI Python Backend
 │   ├── app/
-│   │   ├── main.py                   # FastAPI app, CORS, /api/v1/analyze
-│   │   ├── config.py                 # Pydantic Settings (env vars)
+│   │   ├── main.py                       # FastAPI entrypoint, CORS, SSE /api/v1/analyze
+│   │   ├── config.py                     # Pydantic settings & environment vars
 │   │   ├── schemas/
-│   │   │   └── analysis.py           # Pydantic models for structured output
+│   │   │   └── analysis.py               # Structured output models (Pydantic v2)
 │   │   └── services/
-│   │       └── gemma_service.py      # Gemma 4 SDK wrapper + compliance injection
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .env.example
+│   │       ├── gemma_service.py          # Gemma 4 SDK vision/text wrapper
+│   │       └── supabase_service.py       # Supabase Python client helper
+│   ├── requirements.txt                  # Python dependencies (fastapi, supabase, google-genai)
+│   ├── Dockerfile                        # Backend Docker container config
+│   └── .env.example                      # Backend env template
 │
-├── frontend/                         # Next.js 16 TypeScript frontend
+├── frontend/                             # Next.js 16 Turbopack Frontend
 │   ├── app/
-│   │   ├── layout.tsx                # Root layout, fonts, metadata
-│   │   ├── page.tsx                  # Main workbench (state + layout)
-│   │   └── globals.css               # Dark-mode design system
+│   │   ├── layout.tsx                    # Root layout & font configuration
+│   │   ├── page.tsx                      # Landing page (marketing & features)
+│   │   ├── workbench/page.tsx            # Progressive Disclosure Workbench (CAD Workspace)
+│   │   ├── deploy/page.tsx               # Deployment Strategy & Validation page
+│   │   ├── knowledge/page.tsx            # Architectural Knowledge Hub
+│   │   ├── signup/page.tsx               # Supabase Authentication signup flow
+│   │   ├── icon.svg & favicon.ico        # Branding favicons & app icons
+│   │   └── globals.css                   # Blueprint CAD design system & CSS tokens
 │   ├── components/
-│   │   ├── Navbar.tsx                # Glassmorphic header + status indicator
-│   │   ├── UploadDropzone.tsx        # Drag-and-drop image upload
-│   │   ├── ComplianceUploader.tsx    # PDF/TXT compliance uploader
-│   │   ├── ProviderSelector.tsx      # AWS / GCP / Azure pill buttons
-│   │   ├── CritiqueViewer.tsx        # Streaming Markdown renderer
-│   │   ├── DiagramCanvas.tsx         # Interactive Mermaid.js canvas
-│   │   └── CodeExporter.tsx          # Syntax-highlighted Terraform viewer
+│   │   ├── Navbar.tsx                    # Header with project breadcrumbs, provider switcher & search
+│   │   ├── WorkspaceSidebar.tsx          # Collapsible left navigation rail
+│   │   ├── DraftingBoard.tsx             # Interactive sketch ingestion & sample presets
+│   │   ├── DiagramCanvas.tsx             # Interactive Mermaid/CAD diagram centerpiece
+│   │   ├── CritiqueViewer.tsx            # Structured risk finding cards
+│   │   ├── CodeExporter.tsx              # HCL Terraform multi-file IDE
+│   │   ├── AIReasoningPanel.tsx          # Live telemetry feed & health score progress bars
+│   │   ├── ArchitectureMentorChat.tsx    # Context-aware Gemma 4 AI assistant drawer
+│   │   ├── CommandPalette.tsx            # Ctrl + K command search modal
+│   │   ├── SessionHistoryDrawer.tsx      # Past analysis sessions timeline drawer
+│   │   ├── CloudBuddyLogo.tsx            # Friendly cloud mascot SVG component
+│   │   └── ProviderSelector.tsx          # AWS / GCP / Azure segmented selector
+│   ├── lib/
+│   │   └── supabaseClient.ts             # Supabase Browser Client instance
 │   └── hooks/
-│       └── useCloudBuddyStream.ts   # SSE streaming consumer hook
+│       └── useCloudCanvasStream.ts       # Custom SSE streaming consumer hook
 │
 ├── scripts/
-│   └── seed_demo_data.py             # Generate mock sketches + compliance docs
+│   └── seed_demo_data.py                 # Demo sketch generator script
 │
-├── docker-compose.yml                # One-command full-stack dev setup
-├── dev.bat                           # Windows dev launcher
-├── dev.sh                            # macOS/Linux dev launcher
-└── README.md                         # ← You are here
+├── dev.bat                               # Windows 1-click launch script
+├── dev.sh                                # macOS / Linux 1-click launch script
+├── docker-compose.yml                    # Full-stack Docker orchestration
+└── README.md                             # Documentation (You are here)
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start & Installation
 
 ### Prerequisites
 
-- **Python 3.11+** with pip
-- **Node.js 18+** with npm
-- **Google AI Studio API Key** ([Get one here](https://aistudio.google.com/apikey))
+- **Python 3.11+**
+- **Node.js 18+** with `npm`
+- **Google AI Studio API Key** ([Get your API key](https://aistudio.google.com/apikey))
+- **Supabase Project** (URL & Anon Key)
 
-### 1. Clone & Configure
+---
 
-```bash
-git clone <your-repo-url>
-cd cloud-buddy
+### 1. Environment Configuration
 
-# Configure the backend
-cp backend/.env.example backend/.env
-# Edit backend/.env and set your GOOGLE_API_KEY
+Create configuration files in both `backend` and `frontend`:
+
+#### Backend (`backend/.env`):
+```env
+GOOGLE_API_KEY=your_google_ai_studio_key
+GEMMA_MODEL=gemma-4-31b-it
+SUPABASE_URL=https://your-supabase-project.supabase.co
+SUPABASE_KEY=your-supabase-anon-key
+MAX_UPLOAD_SIZE_MB=10
+CORS_ORIGINS=["http://localhost:3000"]
+DEBUG=false
 ```
 
-### 2. Run (Pick One Method)
+#### Frontend (`frontend/.env.local`):
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-#### Option A: Dev Script (Recommended for Local)
+---
 
-**Windows:**
+### 2. Launch Local Development (1-Click)
+
+#### Windows:
 ```cmd
 dev.bat
 ```
 
-**macOS / Linux:**
+#### macOS / Linux:
 ```bash
 chmod +x dev.sh
 ./dev.sh
 ```
 
-#### Option B: Docker Compose
-
+#### Docker Compose (Alternative):
 ```bash
 docker compose up --build
 ```
 
-#### Option C: Manual
-
-```bash
-# Terminal 1 – Backend
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-# Terminal 2 – Frontend
-cd frontend
-npm install
-npm run dev
-```
-
-### 3. Open the App
-
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
-- **API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-
 ---
 
-## 🧪 Demo Data
+### 3. Access Application
 
-Generate mock architecture sketches and a SOC2 compliance document:
-
-```bash
-cd scripts
-pip install pillow   # If not already installed
-python seed_demo_data.py
-```
-
-This creates `scripts/demo_data/` with:
-- `architecture_sketch_basic.png` — 3-tier AWS architecture
-- `architecture_sketch_microservices.png` — ECS microservices
-- `architecture_sketch_serverless.png` — Serverless event-driven
-- `SOC2_Compliance_Rules.txt` — Enterprise security policy
-
-Upload any sketch to CloudBuddy, attach the compliance doc, and hit **Analyze**!
-
----
-
-## ⚙️ Configuration
-
-All backend configuration is via environment variables (or `backend/.env`):
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `GOOGLE_API_KEY` | ✅ | — | Google AI Studio API key |
-| `GEMMA_MODEL` | ❌ | `gemma-4-12b-it` | Model variant (`gemma-4-12b-it` or `gemma-4-4b-it`) |
-| `DEFAULT_CLOUD_PROVIDER` | ❌ | `AWS` | Default provider (AWS, GCP, Azure) |
-| `MAX_UPLOAD_SIZE_MB` | ❌ | `10` | Max file upload size |
-| `CORS_ORIGINS` | ❌ | `["http://localhost:3000", "http://localhost:5173"]` | Allowed CORS origins |
-| `DEBUG` | ❌ | `false` | Enable debug logging |
+- **Frontend Workbench:** [http://localhost:3000/workbench](http://localhost:3000/workbench)
+- **FastAPI API Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
@@ -197,93 +214,44 @@ All backend configuration is via environment variables (or `backend/.env`):
 
 ### `POST /api/v1/analyze`
 
+Accepts an architecture sketch image and streams SSE events progressively.
+
 **Content-Type:** `multipart/form-data`
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `image_file` | File | ✅ | JPEG/PNG/WebP architecture sketch |
-| `compliance_doc` | File | ❌ | PDF/TXT compliance policy |
-| `cloud_provider` | String | ❌ | `AWS`, `GCP`, or `Azure` (default: `AWS`) |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `image_file` | File | ✅ | PNG, JPEG, or WebP architecture sketch |
+| `compliance_doc` | File | ❌ | PDF or TXT security compliance policy |
+| `cloud_provider` | String | ❌ | Target cloud: `AWS`, `GCP`, or `Azure` (default: `AWS`) |
 
-**Response:** `text/event-stream` (SSE)
+**Stream Event Sequence (`text/event-stream`):**
 
-| Event | Payload |
-|-------|---------|
-| `metadata` | `{ cloud_provider, model, status, compliance_loaded }` |
-| `critique` | `{ detected_components[], critique { summary, findings[], score } }` |
-| `mermaid` | `{ mermaid_code }` |
-| `terraform` | `{ terraform_code }` |
-| `done` | `{ status: "complete", compliance_enforced }` |
-| `error` | `{ error, detail }` |
+```text
+event: metadata
+data: {"cloud_provider": "AWS", "model": "gemma-4-31b-it", "status": "processing"}
 
-### `GET /health`
+event: critique
+data: {"detected_components": [...], "critique": {"score": 84, "summary": "...", "findings": [...]}}
 
-Returns `{ "status": "healthy" }` for liveness probes.
+event: mermaid
+data: {"mermaid_code": "graph TD\n  ALB --> EC2\n  EC2 --> RDS"}
 
----
+event: terraform
+data: {"terraform_code": "resource \"aws_vpc\" \"main\" {\n  cidr_block = \"10.0.0.0/16\"\n}"}
 
-## 🛡️ Compliance Context Engine
-
-CloudBuddy supports **enterprise compliance enforcement** via its context injection layer:
-
-1. **Upload** a security policy document (PDF/TXT) alongside your sketch
-2. The full document is **injected into Gemma 4's system prompt** — not truncated to a user message
-3. Gemma treats every policy rule as an **immutable constraint**:
-   - Violations are flagged as `CRITICAL` findings
-   - Terraform code automatically includes mandatory controls
-   - Architecture score is heavily penalised for non-compliance
-4. Supported frameworks: SOC2, HIPAA, PCI-DSS, FedRAMP, ISO 27001, NIST
-
----
-
-## 🏆 Hackathon Presentation Points
-
-### The Problem
-- System design interviews and architecture reviews require expertise
-- Hand-drawn whiteboard sketches are never digitised or validated
-- Compliance validation is manual, error-prone, and expensive
-
-### Our Solution: CloudBuddy
-- **One-click analysis** of whiteboard sketches using Gemma 4 Multimodal
-- **Real-time streaming** results via SSE for instant feedback
-- **Enterprise compliance enforcement** — upload your SOC2/HIPAA policy and get guaranteed compliance
-- **Production-ready output** — Terraform code you can actually deploy
-
-### Technical Differentiators
-- 🧠 **Gemma 4 Multimodal** — visual understanding + code generation in one model
-- 📜 **128K context window** — entire compliance documents, not just summaries
-- ⚡ **SSE streaming** — progressive rendering as the AI thinks
-- 🎨 **Glassmorphic UI** — premium developer experience
-- 🏗️ **Full IaC generation** — not just diagrams, but deployable Terraform
-
-### Impact
-- **10× faster** architecture reviews
-- **Zero compliance misses** with policy-as-context
-- **Bridge the gap** between whiteboard and production
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **AI Model** | Gemma 4 Multimodal (12B / 4B) via Google GenAI SDK |
-| **Backend** | Python 3.11, FastAPI, Pydantic v2, uvicorn |
-| **Frontend** | Next.js 16, TypeScript, Tailwind CSS |
-| **UI Components** | Framer Motion, Lucide Icons |
-| **Rendering** | Mermaid.js, react-markdown, react-syntax-highlighter |
-| **Transport** | Server-Sent Events (SSE) |
-| **Containerization** | Docker, Docker Compose |
+event: done
+data: {"status": "complete"}
+```
 
 ---
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 ---
 
 <p align="center">
-  Built with ⚡ by the CloudBuddy team<br/>
-  Powered by <strong>Gemma 4 Multimodal</strong>
+  Crafted with ⚡ by the <strong>Cloud Buddy</strong> Team<br/>
+  Powered by <strong>Google Gemma 4 Multimodal Engine</strong>
 </p>
