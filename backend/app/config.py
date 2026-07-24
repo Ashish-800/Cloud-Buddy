@@ -24,9 +24,13 @@ class CloudProvider(str, Enum):
 
 
 class GemmaModelVariant(str, Enum):
-    """Available Gemma 4 multimodal checkpoints."""
+    """Available Gemma 4 / Gemini multimodal checkpoints."""
+    GEMMA_4_31B = "gemma-4-31b-it"
+    GEMMA_4_26B = "gemma-4-26b-a4b-it"
     GEMMA_4_12B = "gemma-4-12b-it"
     GEMMA_4_4B = "gemma-4-4b-it"
+    GEMINI_2_0_FLASH = "gemini-2.0-flash"
+    GEMINI_2_5_PRO = "gemini-2.5-pro"
 
 
 class Settings(BaseSettings):
@@ -49,9 +53,9 @@ class Settings(BaseSettings):
         ...,
         description="Google AI Studio API key for Gemma 4 multimodal access.",
     )
-    gemma_model: GemmaModelVariant = Field(
-        default=GemmaModelVariant.GEMMA_4_12B,
-        description="Which Gemma 4 checkpoint to use.",
+    gemma_model: str = Field(
+        default="gemma-4-31b-it",
+        description="Which Gemma 4 / Gemini checkpoint to use.",
     )
 
     # ── Application Defaults ──────────────────────────────────────────
